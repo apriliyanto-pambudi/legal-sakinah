@@ -48,6 +48,11 @@ next-env.d.ts
 .mempalace/
 mempalace.yaml
 entities.json
-.cursor/mcp.json
-.cursor/hooks.json
-.cursor/hooks/
+
+# Agent / internal docs (local only — jangan publish)
+.cursor/
+AGENTS.md
+CLAUDE.md
+PROMPTS.md
+PRD.md
+design-system/
