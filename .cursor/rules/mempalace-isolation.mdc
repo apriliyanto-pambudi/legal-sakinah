@@ -1,0 +1,12 @@
+---
+description: Session-memory isolation + allowlist for legal-sakinah
+alwaysApply: true
+---
+
+- Palace & wing hanya untuk repo ini: **wing=`legal_sakinah`**.
+- `palace_query` yang diizinkan: **search/find**, **diary_read**, **status** (opsional taxonomy wing ini saja).
+- `palace_exec` yang diizinkan: **add_drawer**, **diary_write**, **checkpoint** (hanya untuk catatan sesi di wing ini).
+- Dilarang lewat `palace_exec` / `palace_query`: mine, sync, delete_*, kg_*, tunnel/hallway, graph, coordinate/logstream/task.
+- Jangan baca/tulis wing atau palace project lain.
+- Jangan `mine` folder project / folder induk.
+- Kalau keputusan penting muncul di chat pendek, simpan segera dengan `palace_exec` (jangan menunggu hook stop).

@@ -1,0 +1,68 @@
+/* Legal Sakinah — Design Tokens
+ * Sumber: design-system/legal-sakinah/MASTER.md (UI UX Pro Max)
+ * Arah brand: calm · trust · hukum keluarga Islami · semboyan "Amanah Menuntaskan"
+ * Ganti nilai di sini saja; jangan hardcode hex di komponen.
+ */
+
+:root {
+  /* ── Brand ───────────────────────────────────────── */
+  /* Deep ink-teal: tenang, berwibawa, bukan navy korporat keras */
+  --color-primary:            #0e2f3a;
+  --color-primary-foreground: #f7faf8;
+  --color-secondary:          #1a4a52;
+  --color-secondary-foreground: #f7faf8;
+
+  /* CTA — trust gold (bukan orange agresif) */
+  --color-accent:             #a16207;
+  --color-cta:                #a16207;
+  --color-cta-foreground:     #ffffff;
+  --color-cta-hover:          #854d0e;
+
+  /* ── Surfaces ────────────────────────────────────── */
+  --color-background:         #f2f5f3; /* sage mist */
+  --color-surface:            #ffffff;
+  --color-muted:              #e4ebe7;
+  --color-border:             #c9d5cf;
+
+  /* ── Text ────────────────────────────────────────── */
+  --color-text:               #0f1c1a;
+  --color-text-muted:         #4a5c57;
+
+  /* ── Atmosphere accents (hero/band) ───────────────── */
+  --color-hero-glow:          rgba(161, 98, 7, 0.18);
+  --color-hero-mist:          rgba(26, 74, 82, 0.45);
+
+  /* ── Status ──────────────────────────────────────── */
+  --color-success-soft:       #ecfdf5;
+
+  /* ── Typography ──────────────────────────────────── */
+  --font-heading: "EB Garamond", ui-serif, Georgia, serif;
+  --font-body:    "Lato", ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Radius ──────────────────────────────────────── */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  20px;
+
+  /* ── Spacing ─────────────────────────────────────── */
+  --space-xs:   0.25rem;
+  --space-sm:   0.5rem;
+  --space-md:   1rem;
+  --space-lg:   1.5rem;
+  --space-xl:   2rem;
+  --space-2xl:  3rem;
+  --space-3xl:  4.5rem;
+
+  /* ── Shadows ─────────────────────────────────────── */
+  --shadow-sm:  0 1px 2px rgba(14, 47, 58, 0.05);
+  --shadow-md:  0 8px 24px rgba(14, 47, 58, 0.08);
+  --shadow-lg:  0 16px 40px rgba(14, 47, 58, 0.12);
+  --shadow-xl:  0 24px 56px rgba(14, 47, 58, 0.16);
+
+  /* ── Motion ──────────────────────────────────────── */
+  --duration-fast:   180ms;
+  --duration-normal: 280ms;
+  --duration-slow:   700ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}

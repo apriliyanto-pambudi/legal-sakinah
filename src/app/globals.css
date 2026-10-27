@@ -1,0 +1,230 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@theme inline {
+  --color-primary:            var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-secondary:          var(--color-secondary);
+  --color-accent:             var(--color-accent);
+  --color-cta:                var(--color-cta);
+  --color-cta-foreground:     var(--color-cta-foreground);
+  --color-cta-hover:          var(--color-cta-hover);
+  --color-background:         var(--color-background);
+  --color-surface:            var(--color-surface);
+  --color-muted:              var(--color-muted);
+  --color-border:             var(--color-border);
+  --color-text:               var(--color-text);
+  --color-text-muted:         var(--color-text-muted);
+
+  --font-heading: var(--font-heading);
+  --font-body:    var(--font-body);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* ── Atmosphere: soft geometric wash (Islamic-inspired, subtle) ── */
+.ls-atmosphere {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 20%, var(--color-hero-glow), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 90% 80%, var(--color-hero-mist), transparent 50%),
+    linear-gradient(155deg, var(--color-primary) 0%, #0a242c 48%, var(--color-secondary) 100%);
+  color: var(--color-primary-foreground);
+}
+
+.ls-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.07;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cpath fill='none' stroke='%23ffffff' stroke-width='1' d='M36 4 L68 36 L36 68 L4 36 Z M36 16 L56 36 L36 56 L16 36 Z'/%3E%3C/svg%3E");
+  background-size: 72px 72px;
+  animation: ls-drift 48s linear infinite;
+}
+
+.ls-atmosphere > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes ls-drift {
+  from { background-position: 0 0; }
+  to { background-position: 72px 36px; }
+}
+
+@keyframes ls-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ls-rise {
+  animation: ls-rise var(--duration-slow) var(--ease-out) both;
+}
+
+.ls-rise-delay-1 { animation-delay: 80ms; }
+.ls-rise-delay-2 { animation-delay: 160ms; }
+.ls-rise-delay-3 { animation-delay: 240ms; }
+
+/* Scroll reveal — lebih pelan dari token --duration-slow (kesan tenang) */
+.ls-reveal:not(.ls-reveal-stagger) {
+  opacity: 0;
+  transform: translateY(1.35rem);
+  transition:
+    opacity 1.05s var(--ease-out),
+    transform 1.05s var(--ease-out);
+}
+.ls-reveal:not(.ls-reveal-stagger).is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.ls-reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(1.1rem);
+  transition:
+    opacity 1s var(--ease-out),
+    transform 1s var(--ease-out);
+}
+.ls-reveal-stagger.is-visible > *:nth-child(1) { transition-delay: 0ms; }
+.ls-reveal-stagger.is-visible > *:nth-child(2) { transition-delay: 120ms; }
+.ls-reveal-stagger.is-visible > *:nth-child(3) { transition-delay: 240ms; }
+.ls-reveal-stagger.is-visible > *:nth-child(4) { transition-delay: 360ms; }
+.ls-reveal-stagger.is-visible > *:nth-child(5) { transition-delay: 480ms; }
+.ls-reveal-stagger.is-visible > *:nth-child(6) { transition-delay: 600ms; }
+.ls-reveal-stagger.is-visible > *:nth-child(7) { transition-delay: 720ms; }
+.ls-reveal-stagger.is-visible > * {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ls-reveal:not(.ls-reveal-stagger),
+  .ls-reveal-stagger > * {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+.ls-motto {
+  font-family: var(--font-heading);
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+
+.ls-rule {
+  height: 1px;
+  width: 3.5rem;
+  background: linear-gradient(90deg, var(--color-accent), transparent);
+}
+
+.ls-soft-panel {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.92)),
+    var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Anchor nav: sticky header 4.25rem + napas ~1.75rem */
+.ls-anchor {
+  scroll-margin-top: 6rem;
+}
+
+/* Testimoni marquee — gulir linear kontinu (track diduplikasi 2x) */
+@keyframes ls-testimonial-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.ls-testimonial-marquee-viewport {
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.ls-testimonial-marquee {
+  animation: ls-testimonial-marquee 45s linear infinite;
+  will-change: transform;
+}
+
+.ls-testimonial-marquee.is-paused {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ls-testimonial-marquee {
+    animation: none;
+  }
+}
+
+/* Hero portrait: soft edge blend into atmosphere (no card / no gold frame) */
+.ls-portrait-presence {
+  isolation: isolate;
+}
+.ls-portrait-presence::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(to top, #0a242c 0%, transparent 32%),
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-primary) 70%, transparent) 0%,
+      transparent 18%
+    ),
+    linear-gradient(
+      to left,
+      color-mix(in srgb, var(--color-secondary) 55%, transparent) 0%,
+      transparent 16%
+    );
+}
