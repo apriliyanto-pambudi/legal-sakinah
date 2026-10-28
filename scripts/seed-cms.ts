@@ -16,7 +16,10 @@ async function main() {
   const { isNull } = await import("drizzle-orm");
   const { db, schema } = await import("../src/server/db");
   const { faqItems } = await import("../src/lib/content/faq");
-  const { getPublishedLandingPage } = await import("../src/lib/content/landing-pages");
+  const {
+    getPublishedLandingPage,
+    getPublishedLandingPageSlugs,
+  } = await import("../src/lib/content/landing-pages");
   const { services } = await import("../src/lib/content/services");
   const { siteConfig } = await import("../src/lib/content/site");
   const { teamMembers } = await import("../src/lib/content/team");
@@ -94,8 +97,10 @@ async function main() {
       .onConflictDoNothing({ target: schema.pages.slug });
   }
 
-  const exampleLp = getPublishedLandingPage("promo-hak-asuh");
-  if (exampleLp) {
+  for (const lpSlug of getPublishedLandingPageSlugs()) {
+    const exampleLp = getPublishedLandingPage(lpSlug);
+    if (!exampleLp) continue;
+
     const inserted = await db
       .insert(schema.landingPages)
       .values({

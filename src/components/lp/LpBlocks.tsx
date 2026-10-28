@@ -6,6 +6,7 @@ import {
 import LpClosingCta from "./LpClosingCta";
 import LpFaq from "./LpFaq";
 import LpHero from "./LpHero";
+import LpImageCards from "./LpImageCards";
 import LpProblem from "./LpProblem";
 import LpProcess from "./LpProcess";
 import LpProof from "./LpProof";
@@ -28,6 +29,7 @@ function renderBlock(
           ctaText={lp.primaryCtaText}
           badges={block.content.badges}
           supportingNote={block.content.supportingNote}
+          heroImageUrl={lp.heroImageUrl}
         />
       );
     case "problem":
@@ -42,6 +44,8 @@ function renderBlock(
       return <LpFaq {...block.content} />;
     case "cta":
       return <LpClosingCta {...block.content} />;
+    case "image_cards":
+      return <LpImageCards {...block.content} />;
     case "custom_html":
       return (
         <section className="bg-background py-12 md:py-16">

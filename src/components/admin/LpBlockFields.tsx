@@ -153,6 +153,27 @@ export default function LpBlockFields({
     );
   }
 
+  if (blockType === "image_cards") {
+    return (
+      <>
+        <Text name="eyebrow" label="Eyebrow" value={asString(data.eyebrow)} />
+        <Text name="title" label="Judul section" value={asString(data.title)} />
+        <Field
+          label="Kartu foto"
+          name="cards"
+          hint="Satu baris per kartu. Format: URL gambar || Judul || Caption || Teks CTA"
+        >
+          <textarea
+            name="cards"
+            rows={8}
+            defaultValue={asImageCards(data.cards)}
+            className={`${adminInputClass} resize-y font-mono text-sm`}
+          />
+        </Field>
+      </>
+    );
+  }
+
   return (
     <Field label="HTML kustom" name="html">
       <textarea
@@ -163,6 +184,23 @@ export default function LpBlockFields({
       />
     </Field>
   );
+}
+
+function asImageCards(value: unknown): string {
+  if (!Array.isArray(value)) return "";
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") return "";
+      const record = item as JsonRecord;
+      return [
+        asString(record.imageUrl),
+        asString(record.title),
+        asString(record.caption),
+        asString(record.ctaText),
+      ].join(" || ");
+    })
+    .filter(Boolean)
+    .join("\n");
 }
 
 function Field({

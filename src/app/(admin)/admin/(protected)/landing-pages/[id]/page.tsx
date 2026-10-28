@@ -31,6 +31,7 @@ interface Props {
 
 const BLOCK_TYPES = [
   { value: "hero", label: "Hero" },
+  { value: "image_cards", label: "Kartu foto" },
   { value: "problem", label: "Masalah" },
   { value: "solution", label: "Solusi" },
   { value: "process", label: "Proses" },
@@ -253,6 +254,22 @@ export default async function EditLandingPagePage({ params, searchParams }: Prop
               defaultValue={lp.subheadline ?? ""}
               className={`${adminInputClass} resize-y`}
             />
+          </div>
+          <div>
+            <label htmlFor="heroImageUrl" className={adminLabelClass}>
+              URL gambar banner (hero)
+            </label>
+            <input
+              id="heroImageUrl"
+              name="heroImageUrl"
+              type="text"
+              defaultValue={lp.heroImageUrl ?? ""}
+              placeholder="/lp/nama-kampanye/banner.jpg"
+              className={`${adminInputClass} font-mono`}
+            />
+            <p className="mt-1 text-xs text-text-muted">
+              Path publik (mis. file di folder public/) atau URL lengkap. Kosongkan untuk hero teks saja.
+            </p>
           </div>
           <div>
             <label htmlFor="primaryCtaText" className={adminLabelClass}>

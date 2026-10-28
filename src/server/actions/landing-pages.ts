@@ -17,6 +17,7 @@ const lpMetaSchema = z.object({
   internalName: z.string().optional(),
   headline: z.string().min(1, "Headline wajib diisi"),
   subheadline: z.string().optional(),
+  heroImageUrl: z.string().optional(),
   primaryCtaText: z.string().default("Konsultasi via WhatsApp"),
   whatsappNumberOverride: z.string().optional(),
   whatsappPrefill: z.string().optional(),
@@ -31,6 +32,7 @@ const BLOCK_TYPES = [
   "proof",
   "faq",
   "cta",
+  "image_cards",
   "custom_html",
 ] as const;
 
@@ -80,11 +82,27 @@ function defaultBlockContent(blockType: string): Record<string, unknown> {
       return { eyebrow: "", title: "", items: [] };
     case "cta":
       return { title: "", description: "", ctaText: "Konsultasi via WhatsApp" };
+    case "image_cards":
+      return { eyebrow: "", title: "", cards: [] };
     case "custom_html":
       return { html: "" };
     default:
       return {};
   }
+}
+
+function parseImageCards(value: FormDataEntryValue | null) {
+  return lines(value).map((line) => {
+    const [imageUrl = "", title = "", caption = "", ctaText = ""] = line
+      .split("||")
+      .map((part) => part.trim());
+    return {
+      imageUrl,
+      title,
+      caption,
+      ctaText: ctaText || "Konsultasi via WhatsApp",
+    };
+  });
 }
 
 function parseBlockContent(
@@ -137,6 +155,12 @@ function parseBlockContent(
         description: String(formData.get("description") ?? ""),
         ctaText: String(formData.get("ctaText") ?? "Konsultasi via WhatsApp"),
       };
+    case "image_cards":
+      return {
+        eyebrow: String(formData.get("eyebrow") ?? ""),
+        title: String(formData.get("title") ?? ""),
+        cards: parseImageCards(formData.get("cards")),
+      };
     case "custom_html":
       return { html: String(formData.get("html") ?? "") };
     default:
@@ -152,6 +176,7 @@ export async function createLandingPage(formData: FormData) {
     internalName: (formData.get("internalName") as string) || undefined,
     headline: formData.get("headline") as string,
     subheadline: (formData.get("subheadline") as string) || undefined,
+    heroImageUrl: (formData.get("heroImageUrl") as string) || undefined,
     primaryCtaText:
       (formData.get("primaryCtaText") as string) || "Konsultasi via WhatsApp",
     whatsappNumberOverride:
@@ -178,6 +203,7 @@ export async function createLandingPage(formData: FormData) {
         internalName: data.internalName ?? null,
         headline: data.headline,
         subheadline: data.subheadline ?? null,
+        heroImageUrl: data.heroImageUrl ?? null,
         primaryCtaText: data.primaryCtaText,
         whatsappNumberOverride: data.whatsappNumberOverride ?? null,
         whatsappPrefill: data.whatsappPrefill ?? null,
@@ -209,6 +235,7 @@ export async function updateLandingPageMeta(id: string, formData: FormData) {
     internalName: (formData.get("internalName") as string) || undefined,
     headline: formData.get("headline") as string,
     subheadline: (formData.get("subheadline") as string) || undefined,
+    heroImageUrl: (formData.get("heroImageUrl") as string) || undefined,
     primaryCtaText:
       (formData.get("primaryCtaText") as string) || "Konsultasi via WhatsApp",
     whatsappNumberOverride:
@@ -235,6 +262,7 @@ export async function updateLandingPageMeta(id: string, formData: FormData) {
         internalName: data.internalName ?? null,
         headline: data.headline,
         subheadline: data.subheadline ?? null,
+        heroImageUrl: data.heroImageUrl ?? null,
         primaryCtaText: data.primaryCtaText,
         whatsappNumberOverride: data.whatsappNumberOverride ?? null,
         whatsappPrefill: data.whatsappPrefill ?? null,
@@ -317,6 +345,7 @@ export async function duplicateLandingPage(id: string) {
         : null,
       headline: original.headline,
       subheadline: original.subheadline,
+      heroImageUrl: original.heroImageUrl,
       primaryCtaText: original.primaryCtaText,
       whatsappNumberOverride: original.whatsappNumberOverride,
       whatsappPrefill: original.whatsappPrefill,

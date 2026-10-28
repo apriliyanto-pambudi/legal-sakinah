@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { CheckCircle } from "lucide-react";
 import WhatsappCta from "@/components/shared/WhatsappCta";
 import { siteConfig } from "@/lib/content/site";
@@ -8,6 +9,7 @@ interface LpHeroProps {
   ctaText: string;
   badges: string[];
   supportingNote: string;
+  heroImageUrl?: string | null;
 }
 
 /**
@@ -15,6 +17,7 @@ interface LpHeroProps {
  *
  * Logo ditampilkan sebagai teks biasa, bukan tautan ke beranda — LP tidak boleh
  * punya jalan keluar selain CTA WhatsApp (design-system/pages/landing-page-ads.md).
+ * Jika `heroImageUrl` diisi, banner visual ditampilkan di atas (pola ads Prestige).
  */
 export default function LpHero({
   headline,
@@ -22,9 +25,23 @@ export default function LpHero({
   ctaText,
   badges,
   supportingNote,
+  heroImageUrl,
 }: LpHeroProps) {
   return (
     <section className="ls-atmosphere overflow-hidden">
+      {heroImageUrl ? (
+        <div className="relative w-full aspect-[16/9] max-h-[420px] bg-primary/40">
+          <Image
+            src={heroImageUrl}
+            alt=""
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+        </div>
+      ) : null}
+
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-14 md:pt-12 md:pb-20">
         <p className="font-heading text-xl font-semibold tracking-tight mb-1">
           {siteConfig.name}
@@ -45,16 +62,20 @@ export default function LpHero({
           {ctaText}
         </WhatsappCta>
 
-        <p className="text-white/60 text-sm mt-4">{supportingNote}</p>
+        {supportingNote ? (
+          <p className="text-white/60 text-sm mt-4">{supportingNote}</p>
+        ) : null}
 
-        <ul className="flex flex-wrap gap-x-5 gap-y-2 mt-8 pt-6 border-t border-white/15">
-          {badges.map((badge) => (
-            <li key={badge} className="flex items-center gap-2 text-sm text-white/75">
-              <CheckCircle className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
-              {badge}
-            </li>
-          ))}
-        </ul>
+        {badges.length > 0 ? (
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 mt-8 pt-6 border-t border-white/15">
+            {badges.map((badge) => (
+              <li key={badge} className="flex items-center gap-2 text-sm text-white/75">
+                <CheckCircle className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
+                {badge}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
     </section>
   );

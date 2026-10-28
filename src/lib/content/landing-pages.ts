@@ -61,6 +61,19 @@ export type LandingPageBlock = LandingPageBlockBase &
         content: { title: string; description: string; ctaText: string };
       }
     | {
+        blockType: "image_cards";
+        content: {
+          eyebrow: string;
+          title: string;
+          cards: {
+            imageUrl: string;
+            title: string;
+            caption: string;
+            ctaText: string;
+          }[];
+        };
+      }
+    | {
         blockType: "custom_html";
         content: { html: string };
       }
@@ -292,6 +305,81 @@ const landingPages: LandingPageRecord[] = [
           title: "Langkah Pertama Cukup Satu Pesan",
           description:
             "Ceritakan situasi Anda kepada kami hari ini. Kami akan bantu memetakan pilihan yang tersedia sebelum Anda memutuskan apa pun.",
+          ctaText: "Konsultasi Sekarang via WhatsApp",
+        },
+      },
+    ],
+  },
+  {
+    slug: "promo-konsultasi-keluarga",
+    internalName: "Paket Konsultasi Keluarga — Promo Bulan Ini (Ads visual)",
+    headline: "Paket Konsultasi Keluarga — Promo Bulan Ini",
+    subheadline:
+      "Gabungan konsultasi hak asuh, proses cerai, dan waris/harta. Ceritakan situasinya dulu via WhatsApp — tanpa tekanan.",
+    heroImageUrl: "/lp/promo-konsultasi-keluarga/banner.jpg",
+    campaignNote: "Template ads visual ala Prestige — ganti gambar & copy di admin.",
+    whatsappNumberOverride: null,
+    whatsappPrefill:
+      "Halo Legal Sakinah, saya tertarik Paket Konsultasi Keluarga (promo bulan ini).",
+    primaryCtaText: "Konsultasi via WhatsApp",
+    themeVariant: "visual",
+    status: "published",
+    noindex: true,
+    blocks: [
+      {
+        blockType: "hero",
+        sortOrder: 0,
+        isVisible: true,
+        content: {
+          badges: [
+            "Advokat berlisensi",
+            "Respons via WhatsApp",
+            "Kerahasiaan dijaga",
+          ],
+          supportingNote:
+            "Promo = akses konsultasi paket layanan. Bukan jaminan hasil perkara.",
+        },
+      },
+      {
+        blockType: "image_cards",
+        sortOrder: 1,
+        isVisible: true,
+        content: {
+          eyebrow: "Isi paket",
+          title: "Tiga area yang bisa Anda konsultasikan",
+          cards: [
+            {
+              imageUrl: "/lp/promo-konsultasi-keluarga/card-hak-asuh.jpg",
+              title: "Hak Asuh Anak",
+              caption:
+                "Pemetaan posisi hukum dan langkah awal soal hak asuh / hadhanah.",
+              ctaText: "Saya mau konsultasi hak asuh",
+            },
+            {
+              imageUrl: "/lp/promo-konsultasi-keluarga/card-cerai.jpg",
+              title: "Proses Cerai",
+              caption:
+                "Alur berkas, mediasi, dan pendampingan di Pengadilan Agama / Negeri.",
+              ctaText: "Saya mau konsultasi cerai",
+            },
+            {
+              imageUrl: "/lp/promo-konsultasi-keluarga/card-waris.jpg",
+              title: "Waris & Harta",
+              caption:
+                "Konsultasi pembagian waris dan harta bersama secara tertib.",
+              ctaText: "Saya mau konsultasi waris",
+            },
+          ],
+        },
+      },
+      {
+        blockType: "cta",
+        sortOrder: 2,
+        isVisible: true,
+        content: {
+          title: "Siap mulai dari satu pesan?",
+          description:
+            "Kirim situasi singkat Anda. Tim kami bantu arahkan opsi yang realistis sebelum Anda memutuskan apa pun.",
           ctaText: "Konsultasi Sekarang via WhatsApp",
         },
       },
