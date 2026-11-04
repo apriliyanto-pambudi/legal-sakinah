@@ -30,6 +30,7 @@ import {
   getPublishedArticles,
 } from "@/lib/content/articles";
 import { getTestimonials } from "@/lib/content/testimonials";
+import { displayServicePrice } from "@/lib/content/services";
 import { siteConfig } from "@/lib/content/site";
 
 export const metadata: Metadata = {
@@ -54,8 +55,12 @@ const iconMap: Record<string, React.ElementType> = {
   Shield,
 };
 
-/** Urutan highlight mengikuti pola referensi: 3 besar + sisanya */
-const FEATURED_SLUGS = ["perceraian", "hak-asuh-anak", "nafkah-harta-bersama"];
+/** 3 litigasi yang paling sering dicari */
+const FEATURED_SLUGS = [
+  "perceraian-muslim",
+  "perceraian-hak-asuh",
+  "harta-bersama",
+];
 
 const values = [
   {
@@ -89,7 +94,9 @@ export default async function BerandaPage() {
     services.find((s) => s.slug === slug)
   ).filter(Boolean) as typeof services;
   const featuredIds = new Set(featured.map((s) => s.slug));
-  const otherServices = services.filter((s) => !featuredIds.has(s.slug));
+  const otherServices = services
+    .filter((s) => !featuredIds.has(s.slug) && s.category === "litigasi")
+    .slice(0, 3);
   const teamPreview = team.slice(0, 3);
 
   return (
@@ -172,7 +179,7 @@ export default async function BerandaPage() {
                     {service.title}
                   </h3>
                   <p className="text-sm font-semibold text-accent mb-3">
-                    {siteConfig.startingPriceLabel}
+                    {displayServicePrice(service)}
                   </p>
                   <p className="text-sm text-text-muted leading-relaxed flex-1 mb-5">
                     {service.summary}
@@ -210,7 +217,7 @@ export default async function BerandaPage() {
                       {service.title}
                     </h3>
                     <p className="text-sm font-semibold text-accent mb-2">
-                      {siteConfig.startingPriceLabel}
+                      {displayServicePrice(service)}
                     </p>
                     <p className="text-sm text-text-muted leading-relaxed mb-3">
                       {service.summary}

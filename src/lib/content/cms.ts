@@ -36,6 +36,7 @@ import { siteConfig } from "./site";
 import {
   getPublishedServices,
   getServiceBySlug,
+  getServiceCatalogMeta,
   type Service,
 } from "./services";
 import { getPublishedTeam, type TeamMember } from "./team";
@@ -61,6 +62,7 @@ async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
 }
 
 function mapService(row: ServiceRow): Service {
+  const meta = getServiceCatalogMeta(row.slug);
   return {
     slug: row.slug,
     title: row.title,
@@ -70,6 +72,8 @@ function mapService(row: ServiceRow): Service {
     seoTitle: row.seoTitle ?? undefined,
     seoDescription: row.seoDescription ?? undefined,
     sortOrder: row.sortOrder,
+    category: meta?.category ?? "litigasi",
+    priceLabel: meta?.priceLabel ?? null,
   };
 }
 

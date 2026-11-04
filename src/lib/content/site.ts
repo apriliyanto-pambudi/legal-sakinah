@@ -4,13 +4,19 @@
  */
 
 export const siteConfig = {
-  name: "Legal Sakinah Indonesia",
+  name: "Legal Sakinah",
   /** Nama pendek untuk header sempit / mobile */
   shortName: "Legal Sakinah",
   motto: "Amanah Menuntaskan",
   tagline: "Konsultasi & Pendampingan Hukum Keluarga",
   description:
-    "Legal Sakinah Indonesia adalah firma hukum yang berfokus pada hukum keluarga: perceraian, hak asuh anak, nafkah, harta bersama, isbat nikah, waris, dan perlindungan KDRT. Kami hadir untuk mendampingi Anda dengan profesional dan penuh empati — Amanah Menuntaskan.",
+    "Legal Sakinah adalah firma hukum yang berfokus pada hukum keluarga: perceraian, hak asuh anak, nafkah, harta bersama, isbat nikah, waris, dan perlindungan KDRT. Kami hadir untuk mendampingi Anda dengan profesional dan penuh empati — Amanah Menuntaskan.",
+  /** Lockup warna (mark + wordmark), PNG transparan */
+  logo: "/images/logo-lockup.png",
+  /** Mark LS saja */
+  logoMark: "/images/logo-mark.png",
+  /** Lockup putih dari logo2 (tanpa foto bg) — untuk permukaan gelap */
+  logoOnDark: "/images/logo-lockup-white.png",
   /** Harga indikatif semua area praktik — final tergantung kompleksitas perkara */
   startingPriceLabel: "Mulai dari Rp. 8.000.000",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
@@ -18,7 +24,7 @@ export const siteConfig = {
     process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "6281234567890",
   waPrefill:
     process.env.NEXT_PUBLIC_WHATSAPP_PREFILL ??
-    "Halo Legal Sakinah Indonesia, saya ingin konsultasi hukum keluarga.",
+    "Halo Legal Sakinah, saya ingin konsultasi hukum keluarga.",
   /** Lokasi kantor — [TBD] dari klien */
   address: "Jakarta Selatan, DKI Jakarta — [TBD]",
   email: "info@legalsakinah.id", // [TBD]

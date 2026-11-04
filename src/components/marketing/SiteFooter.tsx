@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { MapPin, Clock, Mail } from "lucide-react";
 import WhatsappCta from "@/components/shared/WhatsappCta";
+import BrandLogo from "@/components/shared/BrandLogo";
+import HomeBrandLink from "@/components/marketing/HomeBrandLink";
 import type { PublicSiteConfig } from "@/lib/content/cms";
 import { siteConfig } from "@/lib/content/site";
 
@@ -21,10 +23,9 @@ export default function SiteFooter({ site }: { site: PublicSiteConfig }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-14 pb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           <div className="sm:col-span-2 lg:col-span-1">
-            <p className="font-heading text-2xl font-semibold mb-1 text-white">
-              {site.name}
-            </p>
-            <p className="ls-motto text-accent text-sm mb-4">{siteConfig.motto}</p>
+            <HomeBrandLink className="inline-block mb-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white rounded-sm hover:opacity-90 transition-opacity duration-200">
+              <BrandLogo variant="onDark" height={48} />
+            </HomeBrandLink>
             <p className="text-sm text-white/70 leading-relaxed mb-5">
               {site.tagline}. Pendampingan hukum keluarga yang tenang, jujur, dan dapat dipercaya.
             </p>
@@ -97,7 +98,7 @@ export default function SiteFooter({ site }: { site: PublicSiteConfig }) {
 
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-white/45">
           <p>
-            &copy; {new Date().getFullYear()} {site.name}. Seluruh hak cipta dilindungi.
+            &copy; {new Date().getFullYear()} {siteConfig.name}. Seluruh hak cipta dilindungi.
           </p>
           <p className="max-w-md sm:text-right leading-relaxed">
             Informasi di website ini bersifat umum dan tidak merupakan nasihat hukum.

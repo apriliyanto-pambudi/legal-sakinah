@@ -5,8 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import WhatsappCta from "@/components/shared/WhatsappCta";
+import BrandLogo from "@/components/shared/BrandLogo";
+import HomeBrandLink from "@/components/marketing/HomeBrandLink";
 import { siteConfig } from "@/lib/content/site";
 import { scrollToSectionId } from "@/lib/scroll-to-section";
+
 
 /** Hash = scroll section beranda. Tanpa hash = halaman sendiri (Tentang). */
 const navLinks = [
@@ -81,18 +84,19 @@ export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/90 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-[4.25rem] flex items-center justify-between gap-4">
-        <Link
-          href="/"
-          className="group shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-sm"
-        >
-          <span className="block font-heading text-lg sm:text-xl md:text-2xl font-semibold text-primary leading-none tracking-tight group-hover:opacity-90 transition-opacity duration-200">
-            <span className="sm:hidden">{siteConfig.shortName}</span>
-            <span className="hidden sm:inline">{siteConfig.name}</span>
+        <HomeBrandLink className="group shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-sm">
+          <span className="flex items-center gap-2.5 group-hover:opacity-90 transition-opacity duration-200">
+            <BrandLogo variant="mark" priority height={36} />
+            <span className="min-w-0">
+              <span className="block font-heading text-lg sm:text-xl md:text-2xl font-semibold text-primary leading-none tracking-tight">
+                {siteConfig.name}
+              </span>
+              <span className="ls-motto hidden sm:block text-[0.7rem] text-accent mt-1 leading-none">
+                {siteConfig.motto}
+              </span>
+            </span>
           </span>
-          <span className="ls-motto hidden sm:block text-[0.7rem] text-accent mt-1 leading-none">
-            {siteConfig.motto}
-          </span>
-        </Link>
+        </HomeBrandLink>
 
         <nav aria-label="Navigasi utama" className="hidden md:flex items-center gap-7">
           {navLinks.map((link) => {

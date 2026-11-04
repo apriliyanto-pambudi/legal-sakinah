@@ -14,6 +14,7 @@ import {
 import PageHero from "@/components/marketing/PageHero";
 import WhatsappCta from "@/components/shared/WhatsappCta";
 import { getPublicServiceBySlug, getPublicServices } from "@/lib/content/cms";
+import { displayServicePrice } from "@/lib/content/services";
 import { siteConfig } from "@/lib/content/site";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -98,12 +99,19 @@ export default async function LayananDetailPage({ params }: Props) {
             {/* Konten artikel */}
             <article className="lg:col-span-2">
               <p className="text-base font-semibold text-accent mb-6">
-                {siteConfig.startingPriceLabel}
+                {displayServicePrice(service)}
               </p>
-              <p className="text-xs text-text-muted mb-8 leading-relaxed">
-                Biaya bersifat indikatif &ldquo;mulai dari&rdquo;. Nilai akhir menyesuaikan
-                kompleksitas perkara, lingkup pendampingan, dan kesepakatan setelah konsultasi.
-              </p>
+              {service.priceLabel ? (
+                <p className="text-xs text-text-muted mb-8 leading-relaxed">
+                  Biaya bersifat indikatif &ldquo;mulai dari&rdquo;. Nilai akhir menyesuaikan
+                  kompleksitas perkara, lingkup pendampingan, dan kesepakatan setelah konsultasi.
+                </p>
+              ) : (
+                <p className="text-xs text-text-muted mb-8 leading-relaxed">
+                  Biaya menyesuaikan lingkup dokumen atau fasilitasi. Diskusikan kebutuhan Anda
+                  via WhatsApp untuk penawaran.
+                </p>
+              )}
               <div
                 className="prose prose-slate max-w-none
                   prose-headings:font-heading prose-headings:text-primary

@@ -9,9 +9,10 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const organizationLd = {
   "@context": "https://schema.org",
   "@type": "LegalService",
-  name: "Legal Sakinah Indonesia",
+  name: "Legal Sakinah",
   description: "Firma hukum keluarga yang menyediakan konsultasi dan pendampingan hukum: perceraian, hak asuh anak, nafkah, waris, isbat nikah, dan perlindungan KDRT.",
   url: siteUrl,
+  logo: `${siteUrl}/images/logo-lockup.png`,
   address: {
     "@type": "PostalAddress",
     addressLocality: "Jakarta Selatan",
@@ -38,14 +39,18 @@ const lato = Lato({
 
 export const metadata: Metadata = {
   title: {
-    default: "Legal Sakinah Indonesia — Amanah Menuntaskan",
-    template: "%s | Legal Sakinah Indonesia",
+    default: "Legal Sakinah — Amanah Menuntaskan",
+    template: "%s | Legal Sakinah",
   },
   description:
-    "Legal Sakinah Indonesia — Amanah Menuntaskan. Pendampingan hukum keluarga yang tenang, jujur, dan dapat dipercaya.",
+    "Legal Sakinah — Amanah Menuntaskan. Pendampingan hukum keluarga yang tenang, jujur, dan dapat dipercaya.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
   ),
+  icons: {
+    icon: "/images/logo-mark.png",
+    apple: "/images/logo-mark.png",
+  },
 };
 
 export default function RootLayout({

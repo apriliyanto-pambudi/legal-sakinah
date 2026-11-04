@@ -43,7 +43,7 @@ export default function LpHero({
       ) : null}
 
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-14 md:pt-12 md:pb-20">
-        <p className="font-heading text-xl font-semibold tracking-tight mb-1">
+        <p className="font-heading text-xl font-semibold tracking-tight mb-1 text-white">
           {siteConfig.name}
         </p>
         <p className="ls-motto text-accent text-sm mb-10 md:mb-14">{siteConfig.motto}</p>
