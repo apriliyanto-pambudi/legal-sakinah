@@ -32,7 +32,7 @@ import {
 } from "@/lib/content/cms";
 import { formatArticleDate } from "@/lib/content/articles";
 import { displayServicePrice } from "@/lib/content/services";
-import { photoFocusObjectClass } from "@/lib/content/team";
+import { photoObjectPosition } from "@/lib/content/team";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getPublicSiteConfig();
@@ -403,7 +403,8 @@ export default async function BerandaPage() {
                       <img
                         src={member.photoUrl}
                         alt={`Foto ${member.name}`}
-                        className={`w-full h-full object-cover ${photoFocusObjectClass(member.photoFocus)}`}
+                        className="w-full h-full object-cover"
+                        style={{ objectPosition: photoObjectPosition(member.photoFocus) }}
                       />
                     ) : (
                       <div className="flex flex-col items-center gap-2 text-text-muted">

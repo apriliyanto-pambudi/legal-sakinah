@@ -9,7 +9,7 @@ import { zodErrorMessage } from "@/lib/validations/form-error";
 import { and, eq, isNull, max } from "drizzle-orm";
 import { z } from "zod";
 import { saveTeamPhoto } from "@/lib/upload";
-import { parsePhotoFocus } from "@/lib/content/team";
+import { parsePhotoPosition } from "@/lib/content/team";
 
 const teamSchema = z.object({
   name: z.string().min(1, "Nama wajib diisi"),
@@ -17,7 +17,8 @@ const teamSchema = z.object({
   bio: z.string().optional(),
   expertise: z.string().optional(),
   licenseNumber: z.string().optional(),
-  photoFocus: z.enum(["top", "center", "bottom"]).default("center"),
+  /** 0 = atas … 100 = bawah (disimpan sebagai teks di DB). */
+  photoFocus: z.number().min(0).max(100).default(50),
 });
 
 async function resolvePhotoUrl(
@@ -60,7 +61,7 @@ export async function createTeamMember(formData: FormData) {
     bio: (formData.get("bio") as string) || undefined,
     expertise: (formData.get("expertise") as string) || undefined,
     licenseNumber: (formData.get("licenseNumber") as string) || undefined,
-    photoFocus: parsePhotoFocus(formData.get("photoFocus")),
+    photoFocus: parsePhotoPosition(formData.get("photoFocus")),
   };
 
   const parsed = teamSchema.safeParse(raw);
@@ -80,7 +81,7 @@ export async function createTeamMember(formData: FormData) {
     name: data.name,
     roleTitle: data.roleTitle ?? null,
     photoUrl: photoUrl || null,
-    photoFocus: data.photoFocus,
+    photoFocus: String(data.photoFocus),
     bio: data.bio ?? null,
     expertise: parseExpertise(data.expertise),
     licenseNumber: data.licenseNumber ?? null,
@@ -103,7 +104,7 @@ export async function updateTeamMember(id: string, formData: FormData) {
     bio: (formData.get("bio") as string) || undefined,
     expertise: (formData.get("expertise") as string) || undefined,
     licenseNumber: (formData.get("licenseNumber") as string) || undefined,
-    photoFocus: parsePhotoFocus(formData.get("photoFocus")),
+    photoFocus: parsePhotoPosition(formData.get("photoFocus")),
   };
 
   const parsed = teamSchema.safeParse(raw);
@@ -120,7 +121,7 @@ export async function updateTeamMember(id: string, formData: FormData) {
       name: data.name,
       roleTitle: data.roleTitle ?? null,
       photoUrl: photoUrl || null,
-      photoFocus: data.photoFocus,
+      photoFocus: String(data.photoFocus),
       bio: data.bio ?? null,
       expertise: parseExpertise(data.expertise),
       licenseNumber: data.licenseNumber ?? null,

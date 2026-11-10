@@ -3,6 +3,7 @@
  * Swap dengan query CMS di Tahap 5.
  */
 
+/** Legacy labels — masih dibaca dari DB lama. */
 export type PhotoFocus = "top" | "center" | "bottom";
 
 export interface TeamMember {
@@ -10,21 +11,43 @@ export interface TeamMember {
   name: string;
   roleTitle: string;
   photoUrl?: string; // Akan diisi saat ada foto asli
-  /** Fokus object-cover; default center */
-  photoFocus?: PhotoFocus;
+  /**
+   * Posisi vertikal crop (0 = atas, 50 = tengah, 100 = bawah).
+   * Disimpan di kolom photo_focus sebagai angka atau label lama.
+   */
+  photoFocus?: number | PhotoFocus;
   bio: string;
   expertise: string[];
   sortOrder: number;
 }
 
+/** 0–100 untuk CSS object-position Y. */
+export function parsePhotoPosition(value: unknown): number {
+  if (value === "top") return 0;
+  if (value === "bottom") return 100;
+  if (value === "center") return 50;
+  const n = typeof value === "number" ? value : Number(String(value ?? "").trim());
+  if (Number.isFinite(n)) return Math.min(100, Math.max(0, Math.round(n)));
+  return 50;
+}
+
+export function photoObjectPosition(focus?: string | number | null): string {
+  return `center ${parsePhotoPosition(focus)}%`;
+}
+
+/** @deprecated pakai photoObjectPosition — tetap ada agar import lama tidak pecah. */
 export function photoFocusObjectClass(focus?: string | null): string {
-  if (focus === "top") return "object-top";
-  if (focus === "bottom") return "object-bottom";
+  const pos = parsePhotoPosition(focus);
+  if (pos <= 25) return "object-top";
+  if (pos >= 75) return "object-bottom";
   return "object-center";
 }
 
 export function parsePhotoFocus(value: unknown): PhotoFocus {
   if (value === "top" || value === "bottom" || value === "center") return value;
+  const pos = parsePhotoPosition(value);
+  if (pos <= 25) return "top";
+  if (pos >= 75) return "bottom";
   return "center";
 }
 

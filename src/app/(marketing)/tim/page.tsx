@@ -4,7 +4,7 @@ import PageHero from "@/components/marketing/PageHero";
 import WhatsappCta from "@/components/shared/WhatsappCta";
 import { getPublicSiteConfig, getPublicTeam } from "@/lib/content/cms";
 import { siteConfig } from "@/lib/content/site";
-import { photoFocusObjectClass } from "@/lib/content/team";
+import { photoObjectPosition } from "@/lib/content/team";
 
 export const metadata: Metadata = {
   title: `Tim Advokat — ${siteConfig.name}`,
@@ -53,7 +53,8 @@ export default async function TimPage() {
                     <img
                       src={member.photoUrl}
                       alt={`Foto ${member.name}`}
-                      className={`w-full h-full object-cover ${photoFocusObjectClass(member.photoFocus)}`}
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: photoObjectPosition(member.photoFocus) }}
                     />
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-text-muted">

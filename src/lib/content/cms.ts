@@ -58,7 +58,7 @@ import {
   getServiceCatalogMeta,
   type Service,
 } from "./services";
-import { getPublishedTeam, parsePhotoFocus, type TeamMember } from "./team";
+import { getPublishedTeam, parsePhotoPosition, type TeamMember } from "./team";
 import { getTestimonials, type Testimonial } from "./testimonials";
 
 export type PublicSiteConfig = {
@@ -116,7 +116,7 @@ function mapTeam(row: TeamMemberRow): TeamMember {
     name: row.name,
     roleTitle: row.roleTitle ?? "",
     photoUrl: row.photoUrl ?? undefined,
-    photoFocus: parsePhotoFocus(row.photoFocus),
+    photoFocus: parsePhotoPosition(row.photoFocus),
     bio: row.bio ?? "",
     expertise: row.expertise ?? [],
     sortOrder: row.sortOrder,
