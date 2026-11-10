@@ -90,9 +90,9 @@ export default function LoginForm() {
             aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
           >
             {showPassword ? (
-              <EyeOff className="h-4 w-4" aria-hidden="true" />
-            ) : (
               <Eye className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <EyeOff className="h-4 w-4" aria-hidden="true" />
             )}
           </button>
         </div>

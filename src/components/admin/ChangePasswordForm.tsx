@@ -48,9 +48,9 @@ function PasswordField({
           aria-label={visible ? "Sembunyikan password" : "Tampilkan password"}
         >
           {visible ? (
-            <EyeOff className="h-4 w-4" aria-hidden="true" />
-          ) : (
             <Eye className="h-4 w-4" aria-hidden="true" />
+          ) : (
+            <EyeOff className="h-4 w-4" aria-hidden="true" />
           )}
         </button>
       </div>
