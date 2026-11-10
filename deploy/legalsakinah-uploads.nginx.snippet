@@ -1,0 +1,15 @@
+# Sisipkan di server block HTTPS legalsakinah.com (bukan site domain lain).
+# Folder khusus Legal Sakinah — jangan arahkan ke uploads ahmadali.
+#
+# mkdir -p /var/www/shared/legalsakinah.com/uploads/{home,team,lp}
+# chown -R deploy:deploy /var/www/shared/legalsakinah.com
+# Di .env app: UPLOADS_DIR=/var/www/shared/legalsakinah.com/uploads
+# Migrasi sekali (jika ada):
+#   cp -a /var/www/apps/legalsakinah.com/public/uploads/. /var/www/shared/legalsakinah.com/uploads/
+
+location /uploads/ {
+    alias /var/www/shared/legalsakinah.com/uploads/;
+    access_log off;
+    expires 30d;
+    add_header Cache-Control "public";
+}

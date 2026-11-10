@@ -6,7 +6,7 @@ import { db, schema } from "@/server/db";
 import { requireAdmin } from "@/server/auth/guard";
 import { CACHE_TAGS, revalidateCmsTag } from "@/server/cache";
 import { isUniqueViolation, zodErrorMessage } from "@/lib/validations/form-error";
-import { plainTextToHtml } from "@/lib/content/plain-text";
+import { sanitizeCmsHtml } from "@/lib/content/sanitize-html";
 import { and, eq, isNull, max } from "drizzle-orm";
 import { z } from "zod";
 
@@ -48,7 +48,7 @@ export async function createService(formData: FormData) {
     slug: toSlug((formData.get("title") as string) ?? ""),
     title: formData.get("title") as string,
     summary: (formData.get("summary") as string) || undefined,
-    content: plainTextToHtml((formData.get("content") as string) ?? "") || undefined,
+    content: sanitizeCmsHtml((formData.get("content") as string) ?? "") ?? undefined,
     seoTitle: (formData.get("seoTitle") as string) || undefined,
     seoDescription: (formData.get("seoDescription") as string) || undefined,
   };
@@ -110,7 +110,7 @@ export async function updateService(id: string, formData: FormData) {
     slug: existing[0].slug,
     title: formData.get("title") as string,
     summary: (formData.get("summary") as string) || undefined,
-    content: plainTextToHtml((formData.get("content") as string) ?? "") || undefined,
+    content: sanitizeCmsHtml((formData.get("content") as string) ?? "") ?? undefined,
     seoTitle: (formData.get("seoTitle") as string) || undefined,
     seoDescription: (formData.get("seoDescription") as string) || undefined,
   };

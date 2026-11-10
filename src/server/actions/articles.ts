@@ -6,7 +6,7 @@ import { db, schema } from "@/server/db";
 import { requireAdmin } from "@/server/auth/guard";
 import { CACHE_TAGS, revalidateCmsTag } from "@/server/cache";
 import { zodErrorMessage } from "@/lib/validations/form-error";
-import { plainTextToHtml } from "@/lib/content/plain-text";
+import { sanitizeCmsHtml } from "@/lib/content/sanitize-html";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
@@ -56,7 +56,7 @@ export async function createArticle(formData: FormData) {
       title: data.title.trim(),
       slug: data.slug.trim(),
       excerpt: data.excerpt?.trim() || null,
-      content: data.content ? plainTextToHtml(data.content) : null,
+      content: sanitizeCmsHtml(data.content),
       seoTitle: data.seoTitle?.trim() || null,
       seoDescription: data.seoDescription?.trim() || null,
       status: "draft",
@@ -105,7 +105,7 @@ export async function updateArticle(id: string, formData: FormData) {
         title: data.title.trim(),
         slug: data.slug.trim(),
         excerpt: data.excerpt?.trim() || null,
-        content: data.content ? plainTextToHtml(data.content) : null,
+        content: sanitizeCmsHtml(data.content),
         seoTitle: data.seoTitle?.trim() || null,
         seoDescription: data.seoDescription?.trim() || null,
         updatedAt: new Date(),

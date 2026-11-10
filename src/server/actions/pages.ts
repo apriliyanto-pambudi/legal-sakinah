@@ -6,7 +6,7 @@ import { db, schema } from "@/server/db";
 import { requireAdmin } from "@/server/auth/guard";
 import { CACHE_TAGS, revalidateCmsTag } from "@/server/cache";
 import { zodErrorMessage } from "@/lib/validations/form-error";
-import { plainTextToHtml } from "@/lib/content/plain-text";
+import { sanitizeCmsHtml } from "@/lib/content/sanitize-html";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -39,7 +39,7 @@ export async function updatePrivasiPage(id: string, formData: FormData) {
   await requireAdmin();
   const title = (formData.get("title") as string)?.trim();
   if (!title) redirect(`/admin/halaman/${id}?error=${encodeURIComponent("Judul wajib diisi")}`);
-  const content = plainTextToHtml((formData.get("content") as string) ?? "") || null;
+  const content = sanitizeCmsHtml((formData.get("content") as string) ?? "");
   const rows = await db
     .update(schema.pages)
     .set({ title, content, updatedAt: new Date() })
@@ -92,7 +92,7 @@ export async function updatePage(id: string, formData: FormData) {
 
   const raw = {
     title: formData.get("title") as string,
-    content: plainTextToHtml((formData.get("content") as string) ?? "") || undefined,
+    content: sanitizeCmsHtml((formData.get("content") as string) ?? "") ?? undefined,
     seoTitle: (formData.get("seoTitle") as string) || undefined,
     seoDescription: (formData.get("seoDescription") as string) || undefined,
   };
