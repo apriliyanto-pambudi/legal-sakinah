@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import WhatsappCta from "@/components/shared/WhatsappCta";
 
 interface LpClosingCtaProps {
@@ -13,13 +14,18 @@ export default function LpClosingCta({
 }: LpClosingCtaProps) {
   return (
     <section className="py-14 md:py-20 bg-primary text-white">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+      <div className="max-w-[480px] mx-auto px-4 text-center">
         <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-semibold mb-4">
           {title}
         </h2>
         <p className="text-white/75 leading-relaxed mb-8 max-w-xl mx-auto">
           {description}
         </p>
+        <div className="ls-arrow-bounce-group flex justify-center gap-2 mb-6" aria-hidden="true">
+          <ChevronDown className="w-7 h-7 text-accent" />
+          <ChevronDown className="w-7 h-7 text-accent" />
+          <ChevronDown className="w-7 h-7 text-accent" />
+        </div>
         <WhatsappCta ctaLabel="footer_wa" className="text-base px-6 py-3.5">
           {ctaText}
         </WhatsappCta>

@@ -22,7 +22,7 @@ export async function getAllFaqsForAdmin(): Promise<FaqRow[]> {
     .select()
     .from(schema.faqs)
     .where(isNull(schema.faqs.deletedAt))
-    .orderBy(asc(schema.faqs.scope), asc(schema.faqs.sortOrder));
+    .orderBy(asc(schema.faqs.sortOrder));
 }
 
 export async function hasAnyFaqsInDb(): Promise<boolean> {

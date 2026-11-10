@@ -6,7 +6,8 @@ import { db, schema } from "@/server/db";
 import { requireAdmin } from "@/server/auth/guard";
 import { CACHE_TAGS, revalidateCmsTag } from "@/server/cache";
 import { isUniqueViolation, zodErrorMessage } from "@/lib/validations/form-error";
-import { and, eq, isNull } from "drizzle-orm";
+import { plainTextToHtml } from "@/lib/content/plain-text";
+import { and, eq, isNull, max } from "drizzle-orm";
 import { z } from "zod";
 
 const serviceSchema = z.object({
@@ -17,10 +18,8 @@ const serviceSchema = z.object({
   title: z.string().min(1, "Judul wajib diisi"),
   summary: z.string().optional(),
   content: z.string().optional(),
-  icon: z.string().optional(),
   seoTitle: z.string().optional(),
   seoDescription: z.string().optional(),
-  sortOrder: z.coerce.number().int().default(0),
 });
 
 function toSlug(str: string): string {
@@ -46,14 +45,12 @@ export async function createService(formData: FormData) {
   await requireAdmin();
 
   const raw = {
-    slug: (formData.get("slug") as string) || toSlug((formData.get("title") as string) ?? ""),
+    slug: toSlug((formData.get("title") as string) ?? ""),
     title: formData.get("title") as string,
     summary: (formData.get("summary") as string) || undefined,
-    content: (formData.get("content") as string) || undefined,
-    icon: (formData.get("icon") as string) || undefined,
+    content: plainTextToHtml((formData.get("content") as string) ?? "") || undefined,
     seoTitle: (formData.get("seoTitle") as string) || undefined,
     seoDescription: (formData.get("seoDescription") as string) || undefined,
-    sortOrder: formData.get("sortOrder") as string,
   };
 
   const parsed = serviceSchema.safeParse(raw);
@@ -63,22 +60,30 @@ export async function createService(formData: FormData) {
 
   const data = parsed.data;
 
+  const [agg] = await db
+    .select({ maxOrder: max(schema.services.sortOrder) })
+    .from(schema.services)
+    .where(isNull(schema.services.deletedAt));
+  const nextOrder = (agg?.maxOrder ?? 0) + 1;
+
   try {
     await db.insert(schema.services).values({
       slug: data.slug,
       title: data.title,
       summary: data.summary ?? null,
       content: data.content ?? null,
-      icon: data.icon ?? null,
+      icon: "Scale",
       seoTitle: data.seoTitle ?? null,
       seoDescription: data.seoDescription ?? null,
-      sortOrder: data.sortOrder,
+      sortOrder: nextOrder,
       status: "draft",
     });
   } catch (error) {
     if (isUniqueViolation(error)) {
       redirect(
-        `/admin/layanan/new?error=${encodeURIComponent("Slug sudah dipakai. Gunakan slug lain.")}`
+        `/admin/layanan/new?error=${encodeURIComponent(
+          "Slug dari judul sudah dipakai. Ubah judul sedikit lalu simpan lagi."
+        )}`
       );
     }
     throw error;
@@ -91,15 +96,23 @@ export async function createService(formData: FormData) {
 export async function updateService(id: string, formData: FormData) {
   await requireAdmin();
 
+  const existing = await db
+    .select({ slug: schema.services.slug })
+    .from(schema.services)
+    .where(and(eq(schema.services.id, id), isNull(schema.services.deletedAt)))
+    .limit(1);
+
+  if (!existing[0]) {
+    redirect(`/admin/layanan/${id}?error=${encodeURIComponent("Layanan tidak ditemukan.")}`);
+  }
+
   const raw = {
-    slug: formData.get("slug") as string,
+    slug: existing[0].slug,
     title: formData.get("title") as string,
     summary: (formData.get("summary") as string) || undefined,
-    content: (formData.get("content") as string) || undefined,
-    icon: (formData.get("icon") as string) || undefined,
+    content: plainTextToHtml((formData.get("content") as string) ?? "") || undefined,
     seoTitle: (formData.get("seoTitle") as string) || undefined,
     seoDescription: (formData.get("seoDescription") as string) || undefined,
-    sortOrder: formData.get("sortOrder") as string,
   };
 
   const parsed = serviceSchema.safeParse(raw);
@@ -109,32 +122,37 @@ export async function updateService(id: string, formData: FormData) {
 
   const data = parsed.data;
 
-  try {
-    await db
-      .update(schema.services)
-      .set({
-        slug: data.slug,
-        title: data.title,
-        summary: data.summary ?? null,
-        content: data.content ?? null,
-        icon: data.icon ?? null,
-        seoTitle: data.seoTitle ?? null,
-        seoDescription: data.seoDescription ?? null,
-        sortOrder: data.sortOrder,
-        updatedAt: new Date(),
-      })
-      .where(and(eq(schema.services.id, id), isNull(schema.services.deletedAt)));
-  } catch (error) {
-    if (isUniqueViolation(error)) {
-      redirect(
-        `/admin/layanan/${id}?error=${encodeURIComponent("Slug sudah dipakai. Gunakan slug lain.")}`
-      );
-    }
-    throw error;
-  }
+  // sortOrder hanya diubah lewat reorderServices (drag-drop)
+  await db
+    .update(schema.services)
+    .set({
+      title: data.title,
+      summary: data.summary ?? null,
+      content: data.content ?? null,
+      seoTitle: data.seoTitle ?? null,
+      seoDescription: data.seoDescription ?? null,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(schema.services.id, id), isNull(schema.services.deletedAt)));
 
   revalidateServices(data.slug);
   redirect("/admin/layanan");
+}
+
+export async function reorderServices(items: { id: string; sortOrder: number }[]) {
+  await requireAdmin();
+  if (!items.length) return;
+
+  await db.transaction(async (tx) => {
+    for (const item of items) {
+      await tx
+        .update(schema.services)
+        .set({ sortOrder: item.sortOrder, updatedAt: new Date() })
+        .where(and(eq(schema.services.id, item.id), isNull(schema.services.deletedAt)));
+    }
+  });
+
+  revalidateServices();
 }
 
 export async function publishService(id: string) {

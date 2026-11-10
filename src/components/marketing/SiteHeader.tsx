@@ -1,15 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
 import WhatsappCta from "@/components/shared/WhatsappCta";
 import BrandLogo from "@/components/shared/BrandLogo";
 import HomeBrandLink from "@/components/marketing/HomeBrandLink";
-import { siteConfig } from "@/lib/content/site";
 import { scrollToSectionId } from "@/lib/scroll-to-section";
-
 
 /** Hash = scroll section beranda. Tanpa hash = halaman sendiri (Tentang). */
 const navLinks = [
@@ -21,16 +18,65 @@ const navLinks = [
   { href: "/#kontak", hash: "#kontak", label: "Kontak" },
 ];
 
-export default function SiteHeader() {
+export default function SiteHeader({
+  name,
+  motto,
+}: {
+  name: string;
+  motto: string;
+}) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuClosing, setMenuClosing] = useState(false);
+  const [menuEntered, setMenuEntered] = useState(false);
   const [hash, setHash] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuOpenRef = useRef(false);
+
+  const menuVisible = menuOpen || menuClosing;
 
   useEffect(() => {
+    menuOpenRef.current = menuOpen;
+  }, [menuOpen]);
+
+  const closeMenu = useCallback(() => {
+    if (!menuOpenRef.current) return;
+    setMenuClosing(true);
     setMenuOpen(false);
-  }, [pathname]);
+  }, []);
+
+  const openMenu = useCallback(() => {
+    setMenuClosing(false);
+    setMenuOpen(true);
+  }, []);
+
+  const toggleMenu = useCallback(() => {
+    if (menuOpenRef.current) closeMenu();
+    else openMenu();
+  }, [closeMenu, openMenu]);
+
+  useEffect(() => {
+    closeMenu();
+  }, [pathname, closeMenu]);
+
+  useEffect(() => {
+    if (!menuOpen) {
+      setMenuEntered(false);
+      return;
+    }
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setMenuEntered(true));
+    });
+    return () => cancelAnimationFrame(id);
+  }, [menuOpen]);
+
+  /* Fallback unmount jika transitionend tidak terpanggil (reduced-motion, dsb.) */
+  useEffect(() => {
+    if (!menuClosing) return;
+    const t = window.setTimeout(() => setMenuClosing(false), 320);
+    return () => window.clearTimeout(t);
+  }, [menuClosing]);
 
   useEffect(() => {
     function syncHash() {
@@ -48,25 +94,25 @@ export default function SiteHeader() {
         !menuRef.current.contains(e.target as Node) &&
         !menuButtonRef.current?.contains(e.target as Node)
       ) {
-        setMenuOpen(false);
+        closeMenu();
       }
     }
     if (menuOpen) {
       document.addEventListener("mousedown", handleOutsideClick);
     }
     return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [menuOpen]);
+  }, [menuOpen, closeMenu]);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape" && menuOpen) {
-        setMenuOpen(false);
+        closeMenu();
         menuButtonRef.current?.focus();
       }
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [menuOpen]);
+  }, [menuOpen, closeMenu]);
 
   function isActive(href: string, linkHash: string | null) {
     if (linkHash) return pathname === "/" && hash === linkHash;
@@ -75,11 +121,24 @@ export default function SiteHeader() {
 
   function goToSection(linkHash: string) {
     setHash(linkHash);
-    setMenuOpen(false);
+    closeMenu();
     if (pathname !== "/") return; // biar Next navigasi ke /#…
     scrollToSectionId(linkHash.slice(1));
     window.history.pushState(null, "", linkHash);
   }
+
+  function handleMenuTransitionEnd(e: React.TransitionEvent<HTMLDivElement>) {
+    if (e.target !== e.currentTarget) return;
+    if (
+      e.propertyName !== "opacity" &&
+      e.propertyName !== "grid-template-rows"
+    ) {
+      return;
+    }
+    if (menuClosing) setMenuClosing(false);
+  }
+
+  const panelOpen = menuEntered && !menuClosing;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/90 backdrop-blur-md">
@@ -89,10 +148,10 @@ export default function SiteHeader() {
             <BrandLogo variant="mark" priority height={36} />
             <span className="min-w-0">
               <span className="block font-heading text-lg sm:text-xl md:text-2xl font-semibold text-primary leading-none tracking-tight">
-                {siteConfig.name}
+                {name}
               </span>
               <span className="ls-motto hidden sm:block text-[0.7rem] text-accent mt-1 leading-none">
-                {siteConfig.motto}
+                {motto}
               </span>
             </span>
           </span>
@@ -145,65 +204,75 @@ export default function SiteHeader() {
             aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
-            onClick={() => setMenuOpen((v) => !v)}
+            onClick={toggleMenu}
             className="md:hidden p-2.5 rounded-md text-text-muted hover:text-primary hover:bg-muted transition-colors duration-200 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
-            {menuOpen ? (
-              <X className="w-5 h-5" aria-hidden="true" />
-            ) : (
-              <Menu className="w-5 h-5" aria-hidden="true" />
-            )}
+            <span
+              className={`ls-burger${menuOpen ? " is-open" : ""}`}
+              aria-hidden="true"
+            >
+              <span />
+              <span />
+              <span />
+            </span>
           </button>
         </div>
       </div>
 
-      {menuOpen && (
+      {menuVisible ? (
         <div
           id="mobile-menu"
           ref={menuRef}
-          className="md:hidden border-t border-border bg-surface"
+          className={`ls-mobile-menu md:hidden bg-surface${
+            panelOpen ? " is-open" : ""
+          }`}
+          onTransitionEnd={handleMenuTransitionEnd}
         >
-          <nav
-            aria-label="Navigasi mobile"
-            className="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-1"
-          >
-            <p className="ls-motto text-accent text-xs px-3 mb-2">{siteConfig.motto}</p>
-            {navLinks.map((link) => {
-              const active = isActive(link.href, link.hash);
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  aria-current={active ? "page" : undefined}
-                  onClick={(e) => {
-                    if (link.hash && pathname === "/") {
-                      e.preventDefault();
-                      goToSection(link.hash);
-                    } else {
-                      if (link.hash) setHash(link.hash);
-                      setMenuOpen(false);
-                    }
-                  }}
-                  className={`px-3 py-3 rounded-md text-sm transition-colors duration-200 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
-                    active
-                      ? "bg-muted text-primary font-semibold"
-                      : "text-text hover:bg-muted hover:text-primary"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-
-            <WhatsappCta
-              ctaLabel="header_menu_wa"
-              className="mt-3 w-full justify-center text-sm px-4 py-3"
+          <div className="ls-mobile-menu-panel">
+            <nav
+              aria-label="Navigasi mobile"
+              className="max-w-6xl mx-auto border-t border-border px-4 py-4 flex flex-col gap-1"
             >
-              Konsultasi via WhatsApp
-            </WhatsappCta>
-          </nav>
+              <p className="ls-motto ls-mobile-menu-item text-accent text-xs px-3 mb-2">
+                {motto}
+              </p>
+              {navLinks.map((link) => {
+                const active = isActive(link.href, link.hash);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    aria-current={active ? "page" : undefined}
+                    onClick={(e) => {
+                      if (link.hash && pathname === "/") {
+                        e.preventDefault();
+                        goToSection(link.hash);
+                      } else {
+                        if (link.hash) setHash(link.hash);
+                        closeMenu();
+                      }
+                    }}
+                    className={`ls-mobile-menu-item px-3 py-3 rounded-md text-sm transition-colors duration-200 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                      active
+                        ? "bg-muted text-primary font-semibold"
+                        : "text-text hover:bg-muted hover:text-primary"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+
+              <WhatsappCta
+                ctaLabel="header_menu_wa"
+                className="ls-mobile-menu-item mt-3 w-full justify-center text-sm px-4 py-3"
+              >
+                Konsultasi via WhatsApp
+              </WhatsappCta>
+            </nav>
+          </div>
         </div>
-      )}
+      ) : null}
     </header>
   );
 }

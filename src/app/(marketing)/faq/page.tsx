@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ChevronRight } from "lucide-react";
 import PageHero from "@/components/marketing/PageHero";
 import WhatsappCta from "@/components/shared/WhatsappCta";
-import { getPublicFaqs } from "@/lib/content/cms";
+import { getPublicFaqs, getPublicSiteConfig } from "@/lib/content/cms";
 import { siteConfig } from "@/lib/content/site";
 
 export const metadata: Metadata = {
@@ -29,7 +29,10 @@ const categoryLabels: Record<string, string> = {
 };
 
 export default async function FaqPage() {
-  const faqs = await getPublicFaqs();
+  const [faqs, site] = await Promise.all([
+    getPublicFaqs(),
+    getPublicSiteConfig(),
+  ]);
 
   // Kelompokkan per kategori
   const grouped = faqs.reduce<Record<string, typeof faqs>>((acc, faq) => {
@@ -110,7 +113,7 @@ export default async function FaqPage() {
 
       <section className="ls-atmosphere py-14 md:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-          <p className="ls-motto text-accent text-base mb-3">{siteConfig.motto}</p>
+          <p className="ls-motto text-accent text-base mb-3">{site.motto}</p>
           <h2 className="font-heading text-2xl md:text-3xl font-semibold mb-3 text-white">
             Pertanyaan Anda tidak ada di sini?
           </h2>

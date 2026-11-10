@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { EB_Garamond, Lato } from "next/font/google";
+import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { GA4_MEASUREMENT_ID, isGa4Enabled } from "@/lib/analytics";
 import "./globals.css";
@@ -23,17 +23,17 @@ const organizationLd = {
   inLanguage: "id",
 };
 
-const ebGaramond = EB_Garamond({
+const fraunces = Fraunces({
   variable: "--font-heading",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const lato = Lato({
+const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-body",
   subsets: ["latin"],
-  weight: ["300", "400", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -61,7 +61,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${ebGaramond.variable} ${lato.variable} h-full`}
+      className={`${fraunces.variable} ${plusJakartaSans.variable} h-full`}
     >
       <body className="min-h-full flex flex-col antialiased">
         <script

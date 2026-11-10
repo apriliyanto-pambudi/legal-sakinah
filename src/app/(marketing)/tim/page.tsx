@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { User } from "lucide-react";
 import PageHero from "@/components/marketing/PageHero";
 import WhatsappCta from "@/components/shared/WhatsappCta";
-import { getPublicTeam } from "@/lib/content/cms";
+import { getPublicSiteConfig, getPublicTeam } from "@/lib/content/cms";
 import { siteConfig } from "@/lib/content/site";
+import { photoFocusObjectClass } from "@/lib/content/team";
 
 export const metadata: Metadata = {
   title: `Tim Advokat — ${siteConfig.name}`,
@@ -20,7 +21,10 @@ export const metadata: Metadata = {
 };
 
 export default async function TimPage() {
-  const team = await getPublicTeam();
+  const [team, site] = await Promise.all([
+    getPublicTeam(),
+    getPublicSiteConfig(),
+  ]);
 
   return (
     <>
@@ -49,7 +53,7 @@ export default async function TimPage() {
                     <img
                       src={member.photoUrl}
                       alt={`Foto ${member.name}`}
-                      className="w-full h-full object-cover"
+                      className={`w-full h-full object-cover ${photoFocusObjectClass(member.photoFocus)}`}
                     />
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-text-muted">
@@ -92,7 +96,7 @@ export default async function TimPage() {
 
       <section className="ls-atmosphere py-14 md:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-          <p className="ls-motto text-accent text-base mb-3">{siteConfig.motto}</p>
+          <p className="ls-motto text-accent text-base mb-3">{site.motto}</p>
           <h2 className="font-heading text-2xl md:text-3xl font-semibold text-white mb-3">
             Konsultasikan situasi Anda
           </h2>

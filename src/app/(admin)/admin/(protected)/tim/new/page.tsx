@@ -9,6 +9,7 @@ import {
 } from "@/components/admin/form-styles";
 import { createTeamMember } from "@/server/actions/team";
 import { requireAdmin } from "@/server/auth/guard";
+import PhotoUploadField from "@/components/admin/PhotoUploadField";
 
 interface Props {
   searchParams: Promise<{ error?: string }>;
@@ -49,12 +50,7 @@ export default async function NewTimPage({ searchParams }: Props) {
           </label>
           <input id="roleTitle" name="roleTitle" type="text" className={adminInputClass} placeholder="Advokat, Partner" />
         </div>
-        <div>
-          <label htmlFor="photoUrl" className={adminLabelClass}>
-            URL foto
-          </label>
-          <input id="photoUrl" name="photoUrl" type="text" className={adminInputClass} />
-        </div>
+        <PhotoUploadField showFocus />
         <div>
           <label htmlFor="bio" className={adminLabelClass}>
             Bio singkat
@@ -74,20 +70,16 @@ export default async function NewTimPage({ searchParams }: Props) {
           />
           <p className="mt-1 text-xs text-text-muted">Pisahkan dengan koma.</p>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="licenseNumber" className={adminLabelClass}>
-              Nomor izin
-            </label>
-            <input id="licenseNumber" name="licenseNumber" type="text" className={adminInputClass} />
-          </div>
-          <div>
-            <label htmlFor="sortOrder" className={adminLabelClass}>
-              Urutan
-            </label>
-            <input id="sortOrder" name="sortOrder" type="number" defaultValue={0} className={adminInputClass} />
-          </div>
+        <div>
+          <label htmlFor="licenseNumber" className={adminLabelClass}>
+            Nomor izin
+          </label>
+          <input id="licenseNumber" name="licenseNumber" type="text" className={adminInputClass} />
         </div>
+        <p className="text-xs text-text-muted rounded-md border border-border bg-muted/40 px-3 py-2">
+          Urutan otomatis di akhir daftar. Susun ulang dengan drag &amp; drop di
+          halaman Tim setelah disimpan.
+        </p>
         <div className="flex items-center justify-end gap-3 border-t border-border pt-2">
           <Link href="/admin/tim" className={adminBtnGhostClass}>
             Batal

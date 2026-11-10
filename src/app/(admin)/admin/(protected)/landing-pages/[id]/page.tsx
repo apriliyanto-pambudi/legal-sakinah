@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import AdminAlert from "@/components/admin/AdminAlert";
 import DeleteButton from "@/components/admin/DeleteButton";
-import LpBlockFields from "@/components/admin/LpBlockFields";
+import LpBlockList from "@/components/admin/LpBlockList";
+import PhotoUploadField from "@/components/admin/PhotoUploadField";
 import PublishButton from "@/components/admin/PublishButton";
 import StatusBadge from "@/components/admin/StatusBadge";
 import {
@@ -29,16 +30,10 @@ interface Props {
   searchParams: Promise<{ error?: string; saved?: string; tab?: string }>;
 }
 
-const BLOCK_TYPES = [
-  { value: "hero", label: "Hero" },
-  { value: "image_cards", label: "Kartu foto" },
-  { value: "problem", label: "Masalah" },
-  { value: "solution", label: "Solusi" },
-  { value: "process", label: "Proses" },
-  { value: "proof", label: "Bukti" },
-  { value: "faq", label: "FAQ" },
-  { value: "cta", label: "CTA" },
-  { value: "custom_html", label: "HTML kustom" },
+/** LP ads: bagian yang bisa ditambah (hero disembunyikan — slot existing tetap render). */
+const ADDABLE_BLOCK_TYPES = [
+  { value: "image_cards", label: "Deretan foto" },
+  { value: "cta", label: "Tombol WhatsApp" },
 ];
 
 export default async function EditLandingPagePage({ params, searchParams }: Props) {
@@ -89,7 +84,7 @@ export default async function EditLandingPagePage({ params, searchParams }: Prop
             showBlocks ? "text-text-muted hover:bg-muted" : "bg-primary text-white"
           }`}
         >
-          Meta
+          Pengaturan
         </Link>
         <Link
           href={`/admin/landing-pages/${id}?tab=blocks`}
@@ -97,7 +92,7 @@ export default async function EditLandingPagePage({ params, searchParams }: Prop
             showBlocks ? "bg-primary text-white" : "text-text-muted hover:bg-muted"
           }`}
         >
-          Blok ({blocks.length})
+          Isi halaman ({blocks.length})
         </Link>
         {lp.status === "published" ? (
           <Link
@@ -116,87 +111,49 @@ export default async function EditLandingPagePage({ params, searchParams }: Prop
 
       {showBlocks ? (
         <div className="space-y-6">
+          {/* ── Tambah bagian baru ── */}
           <form
             action={addBlockWithId}
-            className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-surface p-4"
+            className="rounded-lg border border-border bg-surface p-4 space-y-3"
           >
-            <div className="min-w-40 flex-1">
-              <label htmlFor="blockType" className={adminLabelClass}>
-                Tipe blok
-              </label>
-              <select id="blockType" name="blockType" className={`${adminInputClass} bg-white`}>
-                {BLOCK_TYPES.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
+            <p className="text-sm font-semibold text-primary">Tambah bagian</p>
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="min-w-48 flex-1">
+                <label htmlFor="blockType" className={adminLabelClass}>
+                  Pilih tipe
+                </label>
+                <select id="blockType" name="blockType" className={`${adminInputClass} bg-white`}>
+                  {ADDABLE_BLOCK_TYPES.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* sortOrder otomatis dari jumlah blok sekarang */}
+              <input type="hidden" name="sortOrder" value={blocks.length} />
+              <button type="submit" className={adminBtnPrimaryClass}>
+                + Tambah
+              </button>
             </div>
-            <div className="w-28">
-              <label htmlFor="sortOrder" className={adminLabelClass}>
-                Urutan
-              </label>
-              <input
-                id="sortOrder"
-                name="sortOrder"
-                type="number"
-                defaultValue={blocks.length}
-                className={adminInputClass}
-              />
-            </div>
-            <button type="submit" className={adminBtnPrimaryClass}>
-              Tambah blok
-            </button>
+            <p className="text-xs text-text-muted">
+              Urutan bisa diatur ulang dengan drag & drop setelah bagian ditambah.
+            </p>
           </form>
 
-          {blocks.length === 0 ? (
-            <p className="text-sm text-text-muted">
-              Belum ada blok. Tambahkan hero, masalah, solusi, dan CTA.
-            </p>
-          ) : (
-            blocks.map((block) => (
-              <form
-                key={block.id}
-                action={updateBlock.bind(null, block.id, id)}
-                className="space-y-4 rounded-lg border border-border bg-surface p-5"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-sm font-semibold capitalize text-primary">
-                    {block.blockType}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <select
-                      name="isVisible"
-                      defaultValue={block.isVisible ? "true" : "false"}
-                      className={`${adminInputClass} w-auto bg-white`}
-                    >
-                      <option value="true">Tampil</option>
-                      <option value="false">Sembunyi</option>
-                    </select>
-                    <input
-                      name="sortOrder"
-                      type="number"
-                      defaultValue={block.sortOrder}
-                      className={`${adminInputClass} w-20`}
-                      aria-label="Urutan blok"
-                    />
-                  </div>
-                </div>
-
-                <LpBlockFields blockType={block.blockType} content={block.content} />
-
-                <div className="flex items-center justify-between border-t border-border pt-3">
-                  <DeleteButton
-                    action={deleteBlock.bind(null, block.id, id)}
-                    confirmMessage="Hapus blok ini?"
-                  />
-                  <button type="submit" className={adminBtnPrimaryClass}>
-                    Simpan blok
-                  </button>
-                </div>
-              </form>
-            ))
-          )}
+          {/* ── Daftar blok dengan drag-drop ── */}
+          <LpBlockList
+            landingPageId={id}
+            blocks={blocks.map((block) => ({
+              id: block.id,
+              blockType: block.blockType,
+              content: block.content,
+              sortOrder: block.sortOrder,
+              isVisible: block.isVisible,
+              updateAction: updateBlock.bind(null, block.id, id),
+              deleteAction: deleteBlock.bind(null, block.id, id),
+            }))}
+          />
         </div>
       ) : (
         <form action={updateMeta} className="space-y-5 rounded-lg border border-border bg-surface p-6">
@@ -222,11 +179,15 @@ export default async function EditLandingPagePage({ params, searchParams }: Prop
               type="text"
               required
               defaultValue={lp.slug}
-              className={`${adminInputClass} font-mono`}
+              readOnly={lp.status === "published"}
+              className={`${adminInputClass} font-mono${
+                lp.status === "published" ? " bg-muted cursor-not-allowed" : ""
+              }`}
             />
             {lp.status === "published" ? (
               <p className="mt-1 text-xs text-amber-700">
-                Mengubah slug LP yang sudah tayang akan memutus URL iklan lama.
+                Slug terkunci karena LP sudah tayang. Mengubahnya akan memutus URL
+                iklan lama — unpublish dulu jika harus ganti.
               </p>
             ) : null}
           </div>
@@ -255,22 +216,15 @@ export default async function EditLandingPagePage({ params, searchParams }: Prop
               className={`${adminInputClass} resize-y`}
             />
           </div>
-          <div>
-            <label htmlFor="heroImageUrl" className={adminLabelClass}>
-              URL gambar banner (hero)
-            </label>
-            <input
-              id="heroImageUrl"
-              name="heroImageUrl"
-              type="text"
-              defaultValue={lp.heroImageUrl ?? ""}
-              placeholder="/lp/nama-kampanye/banner.jpg"
-              className={`${adminInputClass} font-mono`}
-            />
-            <p className="mt-1 text-xs text-text-muted">
-              Path publik (mis. file di folder public/) atau URL lengkap. Kosongkan untuk hero teks saja.
-            </p>
-          </div>
+          <PhotoUploadField
+            currentUrl={lp.heroImageUrl}
+            label="Gambar banner"
+            fileInputName="heroBannerFile"
+            hiddenName="heroImageUrl"
+            hint="JPEG, PNG, atau WebP · Maks 5 MB · Kosongkan untuk hero teks saja"
+            previewClassName="h-40 w-full max-w-sm"
+            alt="Preview banner"
+          />
           <div>
             <label htmlFor="primaryCtaText" className={adminLabelClass}>
               Teks CTA
@@ -285,15 +239,20 @@ export default async function EditLandingPagePage({ params, searchParams }: Prop
           </div>
           <div>
             <label htmlFor="whatsappNumberOverride" className={adminLabelClass}>
-              Nomor WA override
+              Nomor WhatsApp untuk LP ini
             </label>
             <input
               id="whatsappNumberOverride"
               name="whatsappNumberOverride"
-              type="text"
+              type="tel"
+              inputMode="tel"
               defaultValue={lp.whatsappNumberOverride ?? ""}
               className={adminInputClass}
+              placeholder="62812…"
             />
+            <p className="mt-1 text-xs text-text-muted">
+              Format 62812… · Kosong = pakai nomor default situs
+            </p>
           </div>
           <div>
             <label htmlFor="whatsappPrefill" className={adminLabelClass}>

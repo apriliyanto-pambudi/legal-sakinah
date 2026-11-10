@@ -6,7 +6,7 @@ import { db, schema } from "@/server/db";
 import { requireAdmin } from "@/server/auth/guard";
 import { CACHE_TAGS, revalidateCmsTag } from "@/server/cache";
 import { zodErrorMessage } from "@/lib/validations/form-error";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, max } from "drizzle-orm";
 import { z } from "zod";
 
 const faqSchema = z.object({
@@ -14,7 +14,6 @@ const faqSchema = z.object({
   answer: z.string().min(1, "Jawaban wajib diisi"),
   category: z.string().optional(),
   scope: z.enum(["global", "service", "landing_page"]).default("global"),
-  sortOrder: z.coerce.number().int().default(0),
 });
 
 function revalidateFaqs() {
@@ -32,7 +31,6 @@ export async function createFaq(formData: FormData) {
     answer: formData.get("answer") as string,
     category: (formData.get("category") as string) || undefined,
     scope: (formData.get("scope") as string) || "global",
-    sortOrder: formData.get("sortOrder") as string,
   };
 
   const parsed = faqSchema.safeParse(raw);
@@ -42,12 +40,18 @@ export async function createFaq(formData: FormData) {
 
   const data = parsed.data;
 
+  const [agg] = await db
+    .select({ maxOrder: max(schema.faqs.sortOrder) })
+    .from(schema.faqs)
+    .where(isNull(schema.faqs.deletedAt));
+  const nextOrder = (agg?.maxOrder ?? 0) + 1;
+
   await db.insert(schema.faqs).values({
     question: data.question,
     answer: data.answer,
     category: data.category ?? null,
     scope: data.scope,
-    sortOrder: data.sortOrder,
+    sortOrder: nextOrder,
     status: "draft",
   });
 
@@ -63,7 +67,6 @@ export async function updateFaq(id: string, formData: FormData) {
     answer: formData.get("answer") as string,
     category: (formData.get("category") as string) || undefined,
     scope: (formData.get("scope") as string) || "global",
-    sortOrder: formData.get("sortOrder") as string,
   };
 
   const parsed = faqSchema.safeParse(raw);
@@ -73,6 +76,7 @@ export async function updateFaq(id: string, formData: FormData) {
 
   const data = parsed.data;
 
+  // sortOrder hanya diubah lewat reorderFaqs (drag-drop)
   await db
     .update(schema.faqs)
     .set({
@@ -80,13 +84,28 @@ export async function updateFaq(id: string, formData: FormData) {
       answer: data.answer,
       category: data.category ?? null,
       scope: data.scope,
-      sortOrder: data.sortOrder,
       updatedAt: new Date(),
     })
     .where(and(eq(schema.faqs.id, id), isNull(schema.faqs.deletedAt)));
 
   revalidateFaqs();
   redirect("/admin/faq");
+}
+
+export async function reorderFaqs(items: { id: string; sortOrder: number }[]) {
+  await requireAdmin();
+  if (!items.length) return;
+
+  await db.transaction(async (tx) => {
+    for (const item of items) {
+      await tx
+        .update(schema.faqs)
+        .set({ sortOrder: item.sortOrder, updatedAt: new Date() })
+        .where(and(eq(schema.faqs.id, item.id), isNull(schema.faqs.deletedAt)));
+    }
+  });
+
+  revalidateFaqs();
 }
 
 export async function publishFaq(id: string) {

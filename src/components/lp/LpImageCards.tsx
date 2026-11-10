@@ -1,74 +1,42 @@
 import Image from "next/image";
-import WhatsappCta from "@/components/shared/WhatsappCta";
 
 export interface LpImageCardItem {
   imageUrl: string;
-  title: string;
-  caption: string;
-  ctaText: string;
+  /** Field lama — diabaikan di render (kompatibel data CMS lama). */
+  title?: string;
+  caption?: string;
+  ctaText?: string;
 }
 
 interface LpImageCardsProps {
-  eyebrow: string;
-  title: string;
   cards: LpImageCardItem[];
+  /** Diabaikan — sisa content lama dari CMS. */
+  eyebrow?: string;
+  title?: string;
 }
 
 /**
- * Blok kartu foto untuk LP ads visual (pola Prestige: gambar + caption + CTA).
+ * Deretan foto LP ads — ritme Prestige: gambar full-width bertumpuk, tanpa teks.
+ * Desktop: kolom sempit centered (480px).
  */
-export default function LpImageCards({ eyebrow, title, cards }: LpImageCardsProps) {
-  if (cards.length === 0) return null;
+export default function LpImageCards({ cards }: LpImageCardsProps) {
+  const images = cards.filter((card) => Boolean(card.imageUrl));
+  if (images.length === 0) return null;
 
   return (
-    <section className="bg-background py-12 md:py-16">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6">
-        {eyebrow ? (
-          <p className="text-sm font-medium text-accent tracking-wide mb-2">{eyebrow}</p>
-        ) : null}
-        {title ? (
-          <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-primary mb-8 md:mb-10">
-            {title}
-          </h2>
-        ) : null}
-
-        <ul className="flex flex-col gap-10 md:gap-12">
-          {cards.map((card, index) => (
-            <li key={`${card.title}-${index}`} className="flex flex-col gap-4">
-              <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-muted">
-                {card.imageUrl ? (
-                  <Image
-                    src={card.imageUrl}
-                    alt={card.title || `Kartu ${index + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 768px"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-sm text-text-muted">
-                    Belum ada gambar
-                  </div>
-                )}
-              </div>
-
-              {card.title ? (
-                <h3 className="font-heading text-xl font-semibold text-primary">
-                  {card.title}
-                </h3>
-              ) : null}
-
-              {card.caption ? (
-                <p className="text-text-muted text-sm sm:text-base leading-relaxed">
-                  {card.caption}
-                </p>
-              ) : null}
-
-              <WhatsappCta
-                ctaLabel={`image_card_${index}_wa`}
-                className="w-full sm:w-auto text-base px-6 py-3.5 shadow-md justify-center"
-              >
-                {card.ctaText || "Konsultasi via WhatsApp"}
-              </WhatsappCta>
+    <section className="bg-background">
+      <div className="max-w-[480px] mx-auto">
+        <ul className="flex flex-col">
+          {images.map((card, index) => (
+            <li key={`${card.imageUrl}-${index}`}>
+              <Image
+                src={card.imageUrl}
+                alt={`Gambar ${index + 1}`}
+                width={900}
+                height={900}
+                className="w-full h-auto block"
+                sizes="(max-width: 480px) 100vw, 480px"
+              />
             </li>
           ))}
         </ul>

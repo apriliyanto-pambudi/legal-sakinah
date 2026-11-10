@@ -8,6 +8,24 @@ import { CACHE_TAGS, revalidateCmsTag } from "@/server/cache";
 import { isUniqueViolation, zodErrorMessage } from "@/lib/validations/form-error";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
+import { saveLpBanner } from "@/lib/upload";
+
+/** Digits only; leading 08 → 62. Empty → undefined (pakai default situs). */
+function normalizeWaOverride(raw: string | undefined): string | undefined {
+  if (!raw?.trim()) return undefined;
+  let digits = raw.replace(/\D/g, "");
+  if (!digits) return undefined;
+  if (digits.startsWith("08")) digits = `62${digits.slice(1)}`;
+  return digits;
+}
+
+const waOverrideSchema = z
+  .string()
+  .optional()
+  .transform((v) => normalizeWaOverride(v))
+  .refine((v) => v === undefined || /^62\d{8,13}$/.test(v), {
+    message: "Nomor WhatsApp tidak valid. Contoh: 62812…",
+  });
 
 const lpMetaSchema = z.object({
   slug: z
@@ -19,22 +37,27 @@ const lpMetaSchema = z.object({
   subheadline: z.string().optional(),
   heroImageUrl: z.string().optional(),
   primaryCtaText: z.string().default("Konsultasi via WhatsApp"),
-  whatsappNumberOverride: z.string().optional(),
+  whatsappNumberOverride: waOverrideSchema,
   whatsappPrefill: z.string().optional(),
   campaignNote: z.string().optional(),
 });
+/** LP ads: hanya ini yang boleh ditambah dari admin. Renderer tipe lama tetap ada. */
+const ADDABLE_BLOCK_TYPES = ["image_cards", "cta"] as const;
 
-const BLOCK_TYPES = [
-  "hero",
-  "problem",
-  "solution",
-  "process",
-  "proof",
-  "faq",
-  "cta",
-  "image_cards",
-  "custom_html",
-] as const;
+async function resolveHeroImageUrl(
+  formData: FormData,
+  errorRedirectUrl: string
+): Promise<string | undefined> {
+  const file = formData.get("heroBannerFile");
+  if (file instanceof File && file.size > 0) {
+    try {
+      return await saveLpBanner(file);
+    } catch (e) {
+      redirect(`${errorRedirectUrl}?error=${encodeURIComponent((e as Error).message)}`);
+    }
+  }
+  return (formData.get("heroImageUrl") as string) || undefined;
+}
 
 function revalidateLpCache(slug?: string) {
   revalidateCmsTag(CACHE_TAGS.landingPages);
@@ -83,7 +106,7 @@ function defaultBlockContent(blockType: string): Record<string, unknown> {
     case "cta":
       return { title: "", description: "", ctaText: "Konsultasi via WhatsApp" };
     case "image_cards":
-      return { eyebrow: "", title: "", cards: [] };
+      return { cards: [] };
     case "custom_html":
       return { html: "" };
     default:
@@ -91,24 +114,41 @@ function defaultBlockContent(blockType: string): Record<string, unknown> {
   }
 }
 
-function parseImageCards(value: FormDataEntryValue | null) {
-  return lines(value).map((line) => {
-    const [imageUrl = "", title = "", caption = "", ctaText = ""] = line
-      .split("||")
-      .map((part) => part.trim());
-    return {
-      imageUrl,
-      title,
-      caption,
-      ctaText: ctaText || "Konsultasi via WhatsApp",
-    };
-  });
+async function parseImageCardsFromForm(
+  formData: FormData,
+  errorRedirectUrl: string
+) {
+  const count = Number.parseInt(String(formData.get("cardCount") ?? "0"), 10) || 0;
+  const cards: { imageUrl: string }[] = [];
+
+  for (let i = 0; i < count; i++) {
+    if (formData.get(`cardRemove_${i}`) === "1") continue;
+
+    let imageUrl = String(formData.get(`cardImageUrl_${i}`) ?? "").trim();
+
+    const file = formData.get(`cardImage_${i}`);
+    if (file instanceof File && file.size > 0) {
+      try {
+        imageUrl = await saveLpBanner(file);
+      } catch (e) {
+        redirect(
+          `${errorRedirectUrl}?error=${encodeURIComponent((e as Error).message)}&tab=blocks`
+        );
+      }
+    }
+
+    if (!imageUrl) continue;
+    cards.push({ imageUrl });
+  }
+
+  return cards;
 }
 
-function parseBlockContent(
+async function parseBlockContent(
   blockType: string,
-  formData: FormData
-): Record<string, unknown> {
+  formData: FormData,
+  errorRedirectUrl: string
+): Promise<Record<string, unknown>> {
   switch (blockType) {
     case "hero":
       return {
@@ -157,9 +197,7 @@ function parseBlockContent(
       };
     case "image_cards":
       return {
-        eyebrow: String(formData.get("eyebrow") ?? ""),
-        title: String(formData.get("title") ?? ""),
-        cards: parseImageCards(formData.get("cards")),
+        cards: await parseImageCardsFromForm(formData, errorRedirectUrl),
       };
     case "custom_html":
       return { html: String(formData.get("html") ?? "") };
@@ -171,12 +209,14 @@ function parseBlockContent(
 export async function createLandingPage(formData: FormData) {
   const session = await requireAdmin();
 
+  const heroImageUrl = await resolveHeroImageUrl(formData, "/admin/landing-pages/new");
+
   const raw = {
     slug: formData.get("slug") as string,
     internalName: (formData.get("internalName") as string) || undefined,
     headline: formData.get("headline") as string,
     subheadline: (formData.get("subheadline") as string) || undefined,
-    heroImageUrl: (formData.get("heroImageUrl") as string) || undefined,
+    heroImageUrl,
     primaryCtaText:
       (formData.get("primaryCtaText") as string) || "Konsultasi via WhatsApp",
     whatsappNumberOverride:
@@ -230,12 +270,14 @@ export async function createLandingPage(formData: FormData) {
 export async function updateLandingPageMeta(id: string, formData: FormData) {
   await requireAdmin();
 
+  const heroImageUrl = await resolveHeroImageUrl(formData, `/admin/landing-pages/${id}`);
+
   const raw = {
     slug: formData.get("slug") as string,
     internalName: (formData.get("internalName") as string) || undefined,
     headline: formData.get("headline") as string,
     subheadline: (formData.get("subheadline") as string) || undefined,
-    heroImageUrl: (formData.get("heroImageUrl") as string) || undefined,
+    heroImageUrl,
     primaryCtaText:
       (formData.get("primaryCtaText") as string) || "Konsultasi via WhatsApp",
     whatsappNumberOverride:
@@ -253,12 +295,25 @@ export async function updateLandingPageMeta(id: string, formData: FormData) {
 
   const data = parsed.data;
 
+  const [current] = await db
+    .select({
+      status: schema.landingPages.status,
+      slug: schema.landingPages.slug,
+    })
+    .from(schema.landingPages)
+    .where(and(eq(schema.landingPages.id, id), isNull(schema.landingPages.deletedAt)))
+    .limit(1);
+
+  // Published: slug locked (ubah URL putus iklan). Draft tetap boleh ganti.
+  const slugToSave =
+    current?.status === "published" ? current.slug : data.slug;
+
   let slug: string | undefined;
   try {
     const rows = await db
       .update(schema.landingPages)
       .set({
-        slug: data.slug,
+        slug: slugToSave,
         internalName: data.internalName ?? null,
         headline: data.headline,
         subheadline: data.subheadline ?? null,
@@ -280,7 +335,6 @@ export async function updateLandingPageMeta(id: string, formData: FormData) {
     }
     throw error;
   }
-
   revalidateLpCache(slug);
   redirect(`/admin/landing-pages/${id}?saved=1`);
 }
@@ -384,7 +438,11 @@ export async function addBlock(landingPageId: string, formData: FormData) {
   await requireAdmin();
 
   const blockType = String(formData.get("blockType") ?? "");
-  if (!BLOCK_TYPES.includes(blockType as (typeof BLOCK_TYPES)[number])) {
+  if (
+    !ADDABLE_BLOCK_TYPES.includes(
+      blockType as (typeof ADDABLE_BLOCK_TYPES)[number]
+    )
+  ) {
     redirect(
       `/admin/landing-pages/${landingPageId}?error=${encodeURIComponent("Tipe blok tidak valid")}&tab=blocks`
     );
@@ -412,7 +470,10 @@ export async function updateBlock(
   await requireAdmin();
 
   const existing = await db
-    .select({ blockType: schema.landingPageBlocks.blockType })
+    .select({
+      blockType: schema.landingPageBlocks.blockType,
+      content: schema.landingPageBlocks.content,
+    })
     .from(schema.landingPageBlocks)
     .where(eq(schema.landingPageBlocks.id, blockId))
     .limit(1);
@@ -424,11 +485,17 @@ export async function updateBlock(
 
   const isVisible = formData.get("isVisible") !== "false";
   const sortOrder = Number.parseInt(String(formData.get("sortOrder") ?? "0"), 10) || 0;
+  const errorRedirectUrl = `/admin/landing-pages/${landingPageId}`;
+  // shortcut: hero field badge/note disembunyikan — jaga content agar bisa di-unhide
+  const content =
+    blockType === "hero"
+      ? ((existing[0].content as Record<string, unknown>) ?? { badges: [], supportingNote: "" })
+      : await parseBlockContent(blockType, formData, errorRedirectUrl);
 
   await db
     .update(schema.landingPageBlocks)
     .set({
-      content: parseBlockContent(blockType, formData),
+      content,
       isVisible,
       sortOrder,
       updatedAt: new Date(),
@@ -446,4 +513,28 @@ export async function deleteBlock(blockId: string, landingPageId: string) {
     .where(eq(schema.landingPageBlocks.id, blockId));
   revalidateLpCache();
   redirect(`/admin/landing-pages/${landingPageId}?tab=blocks`);
+}
+
+export async function reorderBlocks(
+  landingPageId: string,
+  items: { id: string; sortOrder: number }[]
+) {
+  await requireAdmin();
+  if (!items.length) return;
+
+  await db.transaction(async (tx) => {
+    for (const item of items) {
+      await tx
+        .update(schema.landingPageBlocks)
+        .set({ sortOrder: item.sortOrder, updatedAt: new Date() })
+        .where(
+          and(
+            eq(schema.landingPageBlocks.id, item.id),
+            eq(schema.landingPageBlocks.landingPageId, landingPageId)
+          )
+        );
+    }
+  });
+
+  revalidateLpCache();
 }

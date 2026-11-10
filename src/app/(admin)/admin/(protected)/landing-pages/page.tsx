@@ -59,8 +59,19 @@ export default async function AdminLandingPagesPage() {
                   <td className="px-4 py-3 font-medium text-text">
                     {page.internalName || page.headline}
                   </td>
-                  <td className="hidden px-4 py-3 font-mono text-xs text-text-muted md:table-cell">
-                    /{page.slug}
+                  <td className="hidden px-4 py-3 font-mono text-xs md:table-cell">
+                    {page.status === "published" ? (
+                      <Link
+                        href={`/${page.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary underline underline-offset-2 hover:text-secondary"
+                      >
+                        /{page.slug}
+                      </Link>
+                    ) : (
+                      <span className="text-text-muted">/{page.slug}</span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={page.status} />
@@ -75,6 +86,16 @@ export default async function AdminLandingPagesPage() {
                             : publishLandingPage.bind(null, page.id)
                         }
                       />
+                      {page.status === "published" ? (
+                        <Link
+                          href={`/${page.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center rounded-md border border-border px-3 py-1.5 text-sm font-medium text-text hover:bg-muted transition-colors duration-150"
+                        >
+                          Buka publik
+                        </Link>
+                      ) : null}
                       <form action={duplicateLandingPage.bind(null, page.id)}>
                         <button
                           type="submit"

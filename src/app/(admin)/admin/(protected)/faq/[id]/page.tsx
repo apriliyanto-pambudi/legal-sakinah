@@ -123,11 +123,15 @@ export default async function EditFaqPage({ params, searchParams }: Props) {
           </label>
           <input
             id="sortOrder"
-            name="sortOrder"
             type="number"
+            readOnly
             defaultValue={faq.sortOrder}
-            className={adminInputClass}
+            className={`${adminInputClass} bg-muted/50 text-text-muted cursor-not-allowed`}
+            aria-describedby="sortOrder-hint"
           />
+          <p id="sortOrder-hint" className="mt-1 text-xs text-text-muted">
+            Hanya baca. Ubah urutan dengan drag &amp; drop di daftar FAQ.
+          </p>
         </div>
 
         <div className="flex items-center justify-between border-t border-border pt-2">

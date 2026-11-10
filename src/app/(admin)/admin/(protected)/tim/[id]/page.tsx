@@ -17,6 +17,7 @@ import {
   unpublishTeamMember,
   updateTeamMember,
 } from "@/server/actions/team";
+import PhotoUploadField from "@/components/admin/PhotoUploadField";
 import { requireAdmin } from "@/server/auth/guard";
 import { getTeamMemberByIdForAdmin } from "@/server/db/queries/team";
 
@@ -76,12 +77,7 @@ export default async function EditTimPage({ params, searchParams }: Props) {
           </label>
           <input id="roleTitle" name="roleTitle" type="text" defaultValue={member.roleTitle ?? ""} className={adminInputClass} />
         </div>
-        <div>
-          <label htmlFor="photoUrl" className={adminLabelClass}>
-            URL foto
-          </label>
-          <input id="photoUrl" name="photoUrl" type="text" defaultValue={member.photoUrl ?? ""} className={adminInputClass} />
-        </div>
+        <PhotoUploadField currentUrl={member.photoUrl} showFocus currentFocus={member.photoFocus} />
         <div>
           <label htmlFor="bio" className={adminLabelClass}>
             Bio singkat
@@ -120,11 +116,15 @@ export default async function EditTimPage({ params, searchParams }: Props) {
             </label>
             <input
               id="sortOrder"
-              name="sortOrder"
               type="number"
+              readOnly
               defaultValue={member.sortOrder}
-              className={adminInputClass}
+              className={`${adminInputClass} bg-muted/50 text-text-muted cursor-not-allowed`}
+              aria-describedby="sortOrder-hint"
             />
+            <p id="sortOrder-hint" className="mt-1 text-xs text-text-muted">
+              Hanya baca. Ubah urutan dengan drag &amp; drop di daftar Tim.
+            </p>
           </div>
         </div>
         <div className="flex items-center justify-between border-t border-border pt-2">

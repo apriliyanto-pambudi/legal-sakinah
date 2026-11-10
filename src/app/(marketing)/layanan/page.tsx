@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import PageHero from "@/components/marketing/PageHero";
 import WhatsappCta from "@/components/shared/WhatsappCta";
-import { getPublicServices } from "@/lib/content/cms";
+import { getPublicServices, getPublicSiteConfig } from "@/lib/content/cms";
 import { displayServicePrice } from "@/lib/content/services";
 import { siteConfig } from "@/lib/content/site";
 
@@ -34,7 +34,10 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 export default async function LayananPage() {
-  const services = await getPublicServices();
+  const [services, site] = await Promise.all([
+    getPublicServices(),
+    getPublicSiteConfig(),
+  ]);
 
   return (
     <>
@@ -123,7 +126,7 @@ export default async function LayananPage() {
 
       <section className="ls-atmosphere py-14 md:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-          <p className="ls-motto text-accent text-base mb-3">{siteConfig.motto}</p>
+          <p className="ls-motto text-accent text-base mb-3">{site.motto}</p>
           <h2 className="font-heading text-2xl md:text-3xl font-semibold mb-3 text-white">
             Tidak yakin layanan mana yang tepat?
           </h2>

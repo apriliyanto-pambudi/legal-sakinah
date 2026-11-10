@@ -37,6 +37,11 @@ yarn-error.log*
 next-env.d.ts
 *.tsbuildinfo
 
+# user uploads (tidak perlu commit ke git)
+/public/uploads/team/*.jpg
+/public/uploads/team/*.png
+/public/uploads/team/*.webp
+
 # drizzle
 # (keep drizzle/ migrations in git; ignore local kit cache if any)
 

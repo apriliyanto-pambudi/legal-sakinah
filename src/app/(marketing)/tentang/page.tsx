@@ -4,6 +4,7 @@ import CmsHtml from "@/components/shared/CmsHtml";
 import PageHero from "@/components/marketing/PageHero";
 import WhatsappCta from "@/components/shared/WhatsappCta";
 import { getPublicPage, getPublicSiteConfig } from "@/lib/content/cms";
+import { getTentangSettings } from "@/server/db/queries/site-settings";
 import { siteConfig } from "@/lib/content/site";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -22,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description:
         page?.seoDescription ||
         "Firma hukum keluarga yang hadir dengan pendekatan profesional dan empatik.",
-      url: `${site.url}/tentang`,
+      url: `${siteConfig.url}/tentang`,
       siteName: site.name,
       locale: "id_ID",
       type: "website",
@@ -30,38 +31,69 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const values = [
+// Fallback hardcode — dipakai hanya jika CMS kosong
+const DEFAULT_BANNER_DESC =
+  "Firma hukum keluarga yang berdiri dengan satu keyakinan: setiap orang berhak mendapatkan pendampingan hukum yang profesional sekaligus manusiawi.";
+
+const DEFAULT_PRACTICE_AREAS = [
+  "Proses Perceraian (cerai talak & cerai gugat)",
+  "Hak Asuh Anak (hadhanah)",
+  "Nafkah & Harta Bersama",
+  "Isbat Nikah",
+  "Waris Keluarga",
+  "KDRT & Perlindungan Hukum",
+];
+
+const DEFAULT_NILAI = [
   {
-    icon: CheckCircle,
     title: "Profesionalisme",
     desc: "Setiap perkara ditangani dengan standar etika profesi advokat yang ketat, didukung pemahaman mendalam terhadap hukum keluarga.",
   },
   {
-    icon: CheckCircle,
     title: "Empati",
     desc: "Kami memahami bahwa di balik berkas perkara ada manusia yang sedang menghadapi masa paling berat. Kami mendengar, bukan hanya memproses.",
   },
   {
-    icon: CheckCircle,
     title: "Kejujuran",
     desc: "Kami tidak menjanjikan hasil yang tidak bisa kami pastikan. Klien mendapat gambaran realistis sejak awal agar dapat membuat keputusan yang tepat.",
   },
   {
-    icon: CheckCircle,
     title: "Kerahasiaan",
     desc: "Setiap informasi yang Anda bagikan terlindungi oleh prinsip kerahasiaan advokat-klien. Privasi Anda adalah prioritas mutlak.",
   },
 ];
 
 export default async function TentangPage() {
-  const page = await getPublicPage("tentang");
+  const [page, site, tentang] = await Promise.all([
+    getPublicPage("tentang"),
+    getPublicSiteConfig(),
+    getTentangSettings(),
+  ]);
   const cmsHtml = page?.content?.trim();
+
+  // Resolve CMS → fallback
+  const bannerDesc = tentang.bannerDesc.trim() || DEFAULT_BANNER_DESC;
+
+  const practiceAreas = tentang.practiceAreas.trim()
+    ? tentang.practiceAreas.split("\n").map((s) => s.trim()).filter(Boolean)
+    : DEFAULT_PRACTICE_AREAS;
+
+  // Parse "Judul\nDeskripsi\n\nJudul\nDeskripsi" → [{title, desc}]
+  function parseNilai(text: string) {
+    return text.trim().split(/\n[ \t]*\n/).map((block) => {
+      const lines = block.trim().split("\n");
+      return { title: lines[0]?.trim() ?? "", desc: lines.slice(1).join(" ").trim() };
+    }).filter((v) => v.title);
+  }
+
+  const nilaiRaw = tentang.nilaiText.trim() ? parseNilai(tentang.nilaiText) : null;
+  const nilai = nilaiRaw?.length ? nilaiRaw : DEFAULT_NILAI;
 
   return (
     <>
       <PageHero
         title={page?.title || "Tentang Legal Sakinah"}
-        description="Firma hukum keluarga yang berdiri dengan satu keyakinan: setiap orang berhak mendapatkan pendampingan hukum yang profesional sekaligus manusiawi."
+        description={bannerDesc}
         crumbs={[
           { href: "/", label: "Beranda" },
           { label: "Tentang Kami" },
@@ -76,7 +108,7 @@ export default async function TentangPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             <div>
-              <p className="ls-motto text-accent text-sm mb-2">{siteConfig.motto}</p>
+              <p className="ls-motto text-accent text-sm mb-2">{site.motto}</p>
               <div className="ls-rule mb-4" aria-hidden="true" />
               <h2 className="font-heading text-3xl md:text-4xl font-semibold text-primary mb-5">
                 Hadir untuk mendampingi, bukan hanya memproses
@@ -97,14 +129,7 @@ export default async function TentangPage() {
             <div className="ls-soft-panel rounded-xl p-8">
               <h3 className="font-heading text-xl font-semibold text-primary mb-6">Area praktik utama</h3>
               <ul className="flex flex-col gap-3">
-                {[
-                  "Proses Perceraian (cerai talak & cerai gugat)",
-                  "Hak Asuh Anak (hadhanah)",
-                  "Nafkah & Harta Bersama",
-                  "Isbat Nikah",
-                  "Waris Keluarga",
-                  "KDRT & Perlindungan Hukum",
-                ].map((item) => (
+                {practiceAreas.map((item) => (
                   <li key={item} className="flex items-center gap-3 text-sm text-text">
                     <CheckCircle className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
                     {item}
@@ -132,25 +157,22 @@ export default async function TentangPage() {
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-8">
-            {values.map((v) => {
-              const Icon = v.icon;
-              return (
-                <div key={v.title} className="flex items-start gap-4 border-t border-border pt-5">
-                  <Icon className="w-5 h-5 text-accent shrink-0 mt-0.5" aria-hidden="true" />
-                  <div>
-                    <h3 className="font-semibold text-text mb-1">{v.title}</h3>
-                    <p className="text-sm text-text-muted leading-relaxed">{v.desc}</p>
-                  </div>
+            {nilai.map((v) => (
+              <div key={v.title} className="flex items-start gap-4 border-t border-border pt-5">
+                <CheckCircle className="w-5 h-5 text-accent shrink-0 mt-0.5" aria-hidden="true" />
+                <div>
+                  <h3 className="font-semibold text-text mb-1">{v.title}</h3>
+                  <p className="text-sm text-text-muted leading-relaxed">{v.desc}</p>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       <section className="ls-atmosphere py-14 md:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-          <p className="ls-motto text-accent text-base mb-3">{siteConfig.motto}</p>
+          <p className="ls-motto text-accent text-base mb-3">{site.motto}</p>
           <h2 className="font-heading text-2xl md:text-3xl font-semibold mb-3 text-white">
             Mulai dengan sebuah percakapan
           </h2>

@@ -276,6 +276,8 @@ export const teamMembers = pgTable(
     /** Contoh: Advokat, Partner */
     roleTitle: text("role_title"),
     photoUrl: text("photo_url"),
+    /** Fokus crop object-cover: top | center | bottom */
+    photoFocus: text("photo_focus").notNull().default("center"),
     bio: text("bio"),
     expertise: text("expertise").array(),
     /** Nomor izin advokat — tampil/tidak [TBD] */
@@ -291,6 +293,29 @@ export const teamMembers = pgTable(
       .defaultNow(),
   },
   (t) => [index("idx_team_members_status_sort").on(t.status, t.sortOrder)]
+);
+
+/** Testimoni anonim beranda — tanpa nama lengkap */
+export const testimonials = pgTable(
+  "testimonials",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    quote: text("quote").notNull(),
+    /** Identitas samar, contoh: "Klien, Jawa Barat" */
+    attribution: text("attribution").notNull(),
+    /** Slug layanan terkait (opsional) */
+    serviceSlug: text("service_slug"),
+    sortOrder: integer("sort_order").notNull().default(0),
+    status: text("status").notNull().default("draft"),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("idx_testimonials_status_sort").on(t.status, t.sortOrder)]
 );
 
 /** Artikel edukasi — opsional v1 [TBD] */
@@ -344,7 +369,8 @@ export const mediaAssets = pgTable("media_assets", {
  * Site settings — key-value.
  * Kunci minimal: whatsapp_number_default, whatsapp_prefill_default,
  * ga4_measurement_id, meta_pixel_id, office_address, office_hours,
- * contact_email, social_links.
+ * contact_email, site_motto, site_description, instagram_url, facebook_url,
+ * hero_*, mid_cta_photo_url.
  */
 export const siteSettings = pgTable("site_settings", {
   key: text("key").primaryKey(),

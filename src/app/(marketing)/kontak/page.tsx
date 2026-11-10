@@ -4,6 +4,7 @@ import PageHero from "@/components/marketing/PageHero";
 import CmsHtml from "@/components/shared/CmsHtml";
 import WhatsappCta from "@/components/shared/WhatsappCta";
 import { getPublicPage, getPublicSiteConfig } from "@/lib/content/cms";
+import { getKontakSettings } from "@/server/db/queries/site-settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [page, site] = await Promise.all([
@@ -29,12 +30,17 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+const DEFAULT_KONTAK_BANNER =
+  "Ceritakan situasi Anda. Langkah pertama adalah percakapan — tanpa tekanan, tanpa komitmen.";
+
 export default async function KontakPage() {
-  const [page, site] = await Promise.all([
+  const [page, site, kontak] = await Promise.all([
     getPublicPage("kontak"),
     getPublicSiteConfig(),
+    getKontakSettings(),
   ]);
   const cmsHtml = page?.content?.trim();
+  const bannerDesc = kontak.bannerDesc.trim() || DEFAULT_KONTAK_BANNER;
 
   const contactItems = [
     {
@@ -68,7 +74,7 @@ export default async function KontakPage() {
     <>
       <PageHero
         title={page?.title || "Hubungi Kami"}
-        description="Ceritakan situasi Anda. Langkah pertama adalah percakapan — tanpa tekanan, tanpa komitmen."
+        description={bannerDesc}
         crumbs={[
           { href: "/", label: "Beranda" },
           { label: "Kontak" },

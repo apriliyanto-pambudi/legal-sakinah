@@ -7,6 +7,7 @@ import StatusBadge from "@/components/admin/StatusBadge";
 import DeleteButton from "@/components/admin/DeleteButton";
 import PublishButton from "@/components/admin/PublishButton";
 import { ChevronLeft } from "lucide-react";
+import ContentTextField from "@/components/admin/ContentTextField";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -71,36 +72,13 @@ export default async function EditLayananPage({ params, searchParams }: Props) {
         </div>
 
         <div>
-          <label htmlFor="slug" className="block text-sm font-medium text-text mb-1.5">
-            Slug <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="slug"
-            name="slug"
-            type="text"
-            required
-            defaultValue={service.slug}
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm font-mono text-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-          />
-          {service.status === "published" && (
-            <p className="mt-1 text-xs text-amber-600">
-              Mengubah slug layanan yang sudah tayang akan memutus URL lama.
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="icon" className="block text-sm font-medium text-text mb-1.5">
-            Ikon Lucide
-          </label>
-          <input
-            id="icon"
-            name="icon"
-            type="text"
-            defaultValue={service.icon ?? ""}
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-            placeholder="Scale / Heart / Landmark / FileText / Users / Shield"
-          />
+          <p className="block text-sm font-medium text-text mb-1.5">Slug</p>
+          <p className="rounded-lg border border-border bg-muted px-3 py-2 text-sm font-mono text-text">
+            {service.slug}
+          </p>
+          <p className="mt-1 text-xs text-text-muted">
+            URL layanan. Tidak bisa diubah agar tautan lama tetap aman.
+          </p>
         </div>
 
         <div>
@@ -116,18 +94,7 @@ export default async function EditLayananPage({ params, searchParams }: Props) {
           />
         </div>
 
-        <div>
-          <label htmlFor="content" className="block text-sm font-medium text-text mb-1.5">
-            Konten <span className="text-text-muted text-xs font-normal">(HTML)</span>
-          </label>
-          <textarea
-            id="content"
-            name="content"
-            rows={14}
-            defaultValue={service.content ?? ""}
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm text-text font-mono focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors resize-y"
-          />
-        </div>
+        <ContentTextField defaultHtml={service.content} rows={14} />
 
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -148,11 +115,15 @@ export default async function EditLayananPage({ params, searchParams }: Props) {
             </label>
             <input
               id="sortOrder"
-              name="sortOrder"
               type="number"
+              readOnly
               defaultValue={service.sortOrder}
-              className="w-full rounded-lg border border-border px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              className="w-full rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-text-muted cursor-not-allowed"
+              aria-describedby="sortOrder-hint"
             />
+            <p id="sortOrder-hint" className="mt-1 text-xs text-text-muted">
+              Hanya baca. Ubah urutan dengan drag &amp; drop di daftar Layanan.
+            </p>
           </div>
         </div>
 

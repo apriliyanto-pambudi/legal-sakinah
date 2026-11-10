@@ -27,8 +27,6 @@ function renderBlock(
           headline={lp.headline}
           subheadline={lp.subheadline}
           ctaText={lp.primaryCtaText}
-          badges={block.content.badges}
-          supportingNote={block.content.supportingNote}
           heroImageUrl={lp.heroImageUrl}
         />
       );
@@ -45,7 +43,7 @@ function renderBlock(
     case "cta":
       return <LpClosingCta {...block.content} />;
     case "image_cards":
-      return <LpImageCards {...block.content} />;
+      return <LpImageCards cards={block.content.cards} />;
     case "custom_html":
       return (
         <section className="bg-background py-12 md:py-16">

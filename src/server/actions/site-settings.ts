@@ -16,6 +16,10 @@ const SETTING_KEYS = [
   "contact_email",
   "site_name",
   "site_tagline",
+  "site_motto",
+  "site_description",
+  "instagram_url",
+  "facebook_url",
 ] as const;
 
 export async function updateSiteSettings(formData: FormData) {

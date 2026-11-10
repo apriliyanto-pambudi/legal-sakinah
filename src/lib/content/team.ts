@@ -3,14 +3,29 @@
  * Swap dengan query CMS di Tahap 5.
  */
 
+export type PhotoFocus = "top" | "center" | "bottom";
+
 export interface TeamMember {
   slug: string;
   name: string;
   roleTitle: string;
   photoUrl?: string; // Akan diisi saat ada foto asli
+  /** Fokus object-cover; default center */
+  photoFocus?: PhotoFocus;
   bio: string;
   expertise: string[];
   sortOrder: number;
+}
+
+export function photoFocusObjectClass(focus?: string | null): string {
+  if (focus === "top") return "object-top";
+  if (focus === "bottom") return "object-bottom";
+  return "object-center";
+}
+
+export function parsePhotoFocus(value: unknown): PhotoFocus {
+  if (value === "top" || value === "bottom" || value === "center") return value;
+  return "center";
 }
 
 export const teamMembers: TeamMember[] = [

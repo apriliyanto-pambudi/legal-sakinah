@@ -63,13 +63,12 @@ export type LandingPageBlock = LandingPageBlockBase &
     | {
         blockType: "image_cards";
         content: {
-          eyebrow: string;
-          title: string;
           cards: {
             imageUrl: string;
-            title: string;
-            caption: string;
-            ctaText: string;
+            /** Legacy — diabaikan di render publik */
+            title?: string;
+            caption?: string;
+            ctaText?: string;
           }[];
         };
       }
@@ -123,183 +122,8 @@ const landingPages: LandingPageRecord[] = [
     noindex: true,
     blocks: [
       {
-        blockType: "hero",
-        sortOrder: 0,
-        isVisible: true,
-        content: {
-          badges: [
-            "Advokat berlisensi",
-            "Kerahasiaan klien terjaga",
-            "Pendampingan sampai putusan",
-          ],
-          supportingNote:
-            "Dijawab langsung oleh tim kami pada jam operasional, Senin–Jumat 09.00–17.00 WIB.",
-        },
-      },
-      {
-        blockType: "problem",
-        sortOrder: 1,
-        isVisible: true,
-        content: {
-          eyebrow: "Situasi yang Anda hadapi",
-          title: "Ketika Anak Menjadi Bagian Paling Berat dari Perpisahan",
-          intro:
-            "Perselisihan hak asuh jarang hanya soal dokumen. Ada kekhawatiran yang menumpuk setiap hari, sementara keputusan harus diambil cepat dan tepat.",
-          items: [
-            "Anda takut kehilangan waktu bersama anak setelah perpisahan.",
-            "Pihak lain sudah menunjuk kuasa hukum, sementara Anda belum tahu harus mulai dari mana.",
-            "Anda tidak yakin dokumen dan bukti apa yang benar-benar dipertimbangkan hakim.",
-            "Kesepakatan lisan soal nafkah dan jadwal bertemu anak tidak dijalankan.",
-            "Anda khawatir langkah yang salah di awal akan sulit diperbaiki nanti.",
-          ],
-        },
-      },
-      {
-        blockType: "solution",
-        sortOrder: 2,
-        isVisible: true,
-        content: {
-          eyebrow: "Yang kami bantu",
-          title: "Pendampingan Menyeluruh untuk Perkara Hak Asuh",
-          intro:
-            "Kami membantu Anda memahami posisi hukum secara jujur, menyiapkan berkas dengan rapi, dan mendampingi Anda di setiap tahapan persidangan.",
-          items: [
-            {
-              title: "Penilaian awal perkara",
-              description:
-                "Kami memetakan fakta, riwayat pengasuhan, dan dasar hukum yang relevan agar Anda tahu pilihan yang realistis sejak awal.",
-            },
-            {
-              title: "Penyusunan permohonan & gugatan",
-              description:
-                "Penyusunan berkas hak asuh, nafkah anak, dan hak bertemu (hadhanah) sesuai kewenangan pengadilan yang tepat.",
-            },
-            {
-              title: "Persiapan bukti & saksi",
-              description:
-                "Pendampingan menyiapkan dokumen, kronologi, dan keterangan saksi agar tersampaikan dengan tertib di persidangan.",
-            },
-            {
-              title: "Upaya damai & mediasi",
-              description:
-                "Bila memungkinkan, kami mengupayakan kesepakatan yang menempatkan kepentingan terbaik anak lebih dulu.",
-            },
-            {
-              title: "Pendampingan persidangan",
-              description:
-                "Mewakili dan mendampingi Anda pada tiap agenda sidang, hingga pembacaan putusan.",
-            },
-            {
-              title: "Tindak lanjut putusan",
-              description:
-                "Penjelasan isi putusan serta langkah hukum lanjutan yang tersedia bila diperlukan.",
-            },
-          ],
-        },
-      },
-      {
-        blockType: "process",
-        sortOrder: 3,
-        isVisible: true,
-        content: {
-          eyebrow: "Tahapan",
-          title: "Empat Langkah, Mulai dari Satu Percakapan",
-          steps: [
-            {
-              title: "Hubungi kami via WhatsApp",
-              description:
-                "Ceritakan situasi Anda secara garis besar. Tidak perlu menyiapkan dokumen apa pun pada tahap ini.",
-            },
-            {
-              title: "Konsultasi & penilaian awal",
-              description:
-                "Kami menjelaskan kerangka hukum yang berlaku, kemungkinan yang ada, serta apa saja yang perlu disiapkan.",
-            },
-            {
-              title: "Persiapan berkas",
-              description:
-                "Tim menyusun berkas dan mengumpulkan bukti pendukung bersama Anda, lalu mendaftarkannya ke pengadilan.",
-            },
-            {
-              title: "Pendampingan hingga putusan",
-              description:
-                "Kami mendampingi setiap agenda sidang dan memberi kabar perkembangan perkara secara berkala.",
-            },
-          ],
-        },
-      },
-      {
-        blockType: "proof",
-        sortOrder: 4,
-        isVisible: true,
-        content: {
-          eyebrow: "Mengapa Legal Sakinah",
-          title: "Profesional dalam Prosedur, Manusiawi dalam Pendekatan",
-          points: [
-            "Fokus pada hukum keluarga: hak asuh, nafkah, perceraian, harta bersama, dan waris.",
-            "Berpengalaman beracara di Pengadilan Agama maupun Pengadilan Negeri.",
-            "Penjelasan tanpa istilah berbelit — Anda tahu apa yang sedang terjadi di setiap tahap.",
-            "Kerahasiaan identitas dan isi perkara dijaga sepenuhnya.",
-          ],
-          testimonials: [
-            {
-              quote:
-                "Saya datang dalam keadaan bingung dan takut. Yang paling membantu adalah dijelaskan apa yang realistis, bukan dijanjikan hal yang muluk.",
-              attribution: "Klien pendampingan hak asuh, Jakarta",
-            },
-            {
-              quote:
-                "Setiap jadwal sidang selalu diinformasikan lebih dulu, dan saya tidak pernah merasa ditinggal sendirian di pengadilan.",
-              attribution: "Klien pendampingan hukum keluarga, Bekasi",
-            },
-          ],
-          note: "Identitas klien dan detail perkara dirahasiakan. Kutipan di atas menggambarkan pengalaman pendampingan, bukan klaim atas hasil perkara.",
-        },
-      },
-      {
-        blockType: "faq",
-        sortOrder: 5,
-        isVisible: true,
-        content: {
-          eyebrow: "Pertanyaan umum",
-          title: "Hal yang Paling Sering Ditanyakan",
-          items: [
-            {
-              question: "Apakah ibu selalu mendapatkan hak asuh anak?",
-              answer:
-                "Tidak otomatis. Untuk anak yang belum mumayyiz, praktik peradilan memang kerap mengutamakan ibu, tetapi hakim tetap menimbang kepentingan terbaik anak berdasarkan fakta yang dibuktikan di persidangan. Ayah juga dapat mengajukan permohonan hak asuh.",
-            },
-            {
-              question: "Ke pengadilan mana perkara hak asuh diajukan?",
-              answer:
-                "Bergantung pada hukum yang berlaku bagi perkawinan Anda. Bagi yang beragama Islam umumnya melalui Pengadilan Agama, sedangkan selainnya melalui Pengadilan Negeri. Kami akan memastikan kewenangan pengadilan yang tepat pada saat konsultasi.",
-            },
-            {
-              question: "Dokumen apa yang biasanya perlu disiapkan?",
-              answer:
-                "Umumnya buku nikah atau akta perkawinan, akta kelahiran anak, kartu keluarga, KTP, serta bukti-bukti pendukung terkait pengasuhan sehari-hari. Daftar rincinya menyesuaikan kondisi perkara Anda.",
-            },
-            {
-              question: "Berapa lama proses hak asuh berlangsung?",
-              answer:
-                "Durasinya berbeda-beda, dipengaruhi kelengkapan berkas, jadwal pengadilan, dan apakah pihak lain hadir serta mengajukan bantahan. Kami akan menyampaikan perkiraan tahapan setelah menilai berkas Anda.",
-            },
-            {
-              question: "Apakah hasil perkara bisa dijamin?",
-              answer:
-                "Tidak. Kami tidak menjanjikan hasil apa pun. Yang kami pastikan adalah persiapan berkas yang tertib, argumentasi yang berdasar, dan pendampingan yang konsisten di setiap tahapan.",
-            },
-            {
-              question: "Apakah konsultasi saya dirahasiakan?",
-              answer:
-                "Ya. Isi konsultasi dan identitas Anda dijaga kerahasiaannya sebagai bagian dari kewajiban profesi advokat.",
-            },
-          ],
-        },
-      },
-      {
         blockType: "cta",
-        sortOrder: 6,
+        sortOrder: 0,
         isVisible: true,
         content: {
           title: "Langkah Pertama Cukup Satu Pesan",
@@ -327,54 +151,26 @@ const landingPages: LandingPageRecord[] = [
     noindex: true,
     blocks: [
       {
-        blockType: "hero",
+        blockType: "image_cards",
         sortOrder: 0,
         isVisible: true,
         content: {
-          badges: [
-            "Advokat berlisensi",
-            "Respons via WhatsApp",
-            "Kerahasiaan dijaga",
-          ],
-          supportingNote:
-            "Promo = akses konsultasi paket layanan. Bukan jaminan hasil perkara.",
-        },
-      },
-      {
-        blockType: "image_cards",
-        sortOrder: 1,
-        isVisible: true,
-        content: {
-          eyebrow: "Isi paket",
-          title: "Tiga area yang bisa Anda konsultasikan",
           cards: [
             {
               imageUrl: "/lp/promo-konsultasi-keluarga/card-hak-asuh.jpg",
-              title: "Hak Asuh Anak",
-              caption:
-                "Pemetaan posisi hukum dan langkah awal soal hak asuh / hadhanah.",
-              ctaText: "Saya mau konsultasi hak asuh",
             },
             {
               imageUrl: "/lp/promo-konsultasi-keluarga/card-cerai.jpg",
-              title: "Proses Cerai",
-              caption:
-                "Alur berkas, mediasi, dan pendampingan di Pengadilan Agama / Negeri.",
-              ctaText: "Saya mau konsultasi cerai",
             },
             {
               imageUrl: "/lp/promo-konsultasi-keluarga/card-waris.jpg",
-              title: "Waris & Harta",
-              caption:
-                "Konsultasi pembagian waris dan harta bersama secara tertib.",
-              ctaText: "Saya mau konsultasi waris",
             },
           ],
         },
       },
       {
         blockType: "cta",
-        sortOrder: 2,
+        sortOrder: 1,
         isVisible: true,
         content: {
           title: "Siap mulai dari satu pesan?",

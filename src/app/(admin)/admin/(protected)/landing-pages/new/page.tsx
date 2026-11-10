@@ -7,6 +7,7 @@ import {
   adminInputClass,
   adminLabelClass,
 } from "@/components/admin/form-styles";
+import PhotoUploadField from "@/components/admin/PhotoUploadField";
 import { createLandingPage } from "@/server/actions/landing-pages";
 import { requireAdmin } from "@/server/auth/guard";
 
@@ -74,6 +75,14 @@ export default async function NewLandingPagePage({ searchParams }: Props) {
           </label>
           <textarea id="subheadline" name="subheadline" rows={3} className={`${adminInputClass} resize-y`} />
         </div>
+        <PhotoUploadField
+          label="Gambar banner"
+          fileInputName="heroBannerFile"
+          hiddenName="heroImageUrl"
+          hint="JPEG, PNG, atau WebP · Maks 5 MB · Kosongkan untuk hero teks saja"
+          previewClassName="h-40 w-full max-w-sm"
+          alt="Preview banner"
+        />
         <div>
           <label htmlFor="primaryCtaText" className={adminLabelClass}>
             Teks CTA
@@ -88,15 +97,19 @@ export default async function NewLandingPagePage({ searchParams }: Props) {
         </div>
         <div>
           <label htmlFor="whatsappNumberOverride" className={adminLabelClass}>
-            Nomor WA override
+            Nomor WhatsApp untuk LP ini
           </label>
           <input
             id="whatsappNumberOverride"
             name="whatsappNumberOverride"
-            type="text"
+            type="tel"
+            inputMode="tel"
             className={adminInputClass}
-            placeholder="Kosong = pakai pengaturan situs"
+            placeholder="62812…"
           />
+          <p className="mt-1 text-xs text-text-muted">
+            Format 62812… · Kosong = pakai nomor default situs
+          </p>
         </div>
         <div>
           <label htmlFor="whatsappPrefill" className={adminLabelClass}>

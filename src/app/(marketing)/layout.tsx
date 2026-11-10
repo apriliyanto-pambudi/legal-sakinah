@@ -25,7 +25,7 @@ export default async function MarketingLayout({
       >
         Langsung ke konten utama
       </a>
-      <SiteHeader />
+      <SiteHeader name={site.name} motto={site.motto} />
       <main id="main-content" className="flex-1">
         {children}
       </main>

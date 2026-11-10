@@ -1,9 +1,12 @@
 export const ADMIN_NAV = [
   { label: "Ringkasan", href: "/admin" },
+  { label: "Beranda", href: "/admin/beranda" },
+  { label: "Halaman situs", href: "/admin/halaman" },
   { label: "Layanan", href: "/admin/layanan" },
-  { label: "FAQ", href: "/admin/faq" },
   { label: "Tim", href: "/admin/tim" },
-  { label: "Halaman", href: "/admin/halaman" },
+  { label: "FAQ", href: "/admin/faq" },
+  { label: "Testimoni", href: "/admin/testimoni" },
+  { label: "Artikel", href: "/admin/artikel" },
   { label: "Landing Pages", href: "/admin/landing-pages" },
   { label: "Pengaturan", href: "/admin/pengaturan" },
 ] as const;

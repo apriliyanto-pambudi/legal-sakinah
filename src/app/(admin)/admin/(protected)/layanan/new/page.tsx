@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/server/auth/guard";
 import { createService } from "@/server/actions/services";
 import { ChevronLeft } from "lucide-react";
+import ContentTextField from "@/components/admin/ContentTextField";
 
 interface Props {
   searchParams: Promise<{ error?: string }>;
@@ -47,33 +48,6 @@ export default async function NewLayananPage({ searchParams }: Props) {
         </div>
 
         <div>
-          <label htmlFor="slug" className="block text-sm font-medium text-text mb-1.5">
-            Slug <span className="text-text-muted text-xs font-normal">(kosongkan = otomatis dari judul)</span>
-          </label>
-          <input
-            id="slug"
-            name="slug"
-            type="text"
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm font-mono text-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-            placeholder="contoh: proses-perceraian"
-          />
-          <p className="mt-1 text-xs text-text-muted">Hanya huruf kecil, angka, dan tanda hubung.</p>
-        </div>
-
-        <div>
-          <label htmlFor="icon" className="block text-sm font-medium text-text mb-1.5">
-            Ikon Lucide
-          </label>
-          <input
-            id="icon"
-            name="icon"
-            type="text"
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-            placeholder="Scale / Heart / Landmark / FileText / Users / Shield"
-          />
-        </div>
-
-        <div>
           <label htmlFor="summary" className="block text-sm font-medium text-text mb-1.5">
             Ringkasan
           </label>
@@ -86,44 +60,26 @@ export default async function NewLayananPage({ searchParams }: Props) {
           />
         </div>
 
+        <ContentTextField
+          rows={10}
+          placeholder={"Contoh:\nKami mendampingi proses ini dari awal hingga putusan.\n\n## Yang kami bantu\n- Konsultasi awal\n- Pendampingan sidang"}
+        />
+
         <div>
-          <label htmlFor="content" className="block text-sm font-medium text-text mb-1.5">
-            Konten <span className="text-text-muted text-xs font-normal">(HTML)</span>
+          <label htmlFor="seoTitle" className="block text-sm font-medium text-text mb-1.5">
+            SEO Title
           </label>
-          <textarea
-            id="content"
-            name="content"
-            rows={10}
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm text-text font-mono focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors resize-y"
-            placeholder="<p>Deskripsi lengkap layanan...</p>"
+          <input
+            id="seoTitle"
+            name="seoTitle"
+            type="text"
+            className="w-full rounded-lg border border-border px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
           />
         </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="seoTitle" className="block text-sm font-medium text-text mb-1.5">
-              SEO Title
-            </label>
-            <input
-              id="seoTitle"
-              name="seoTitle"
-              type="text"
-              className="w-full rounded-lg border border-border px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-            />
-          </div>
-          <div>
-            <label htmlFor="sortOrder" className="block text-sm font-medium text-text mb-1.5">
-              Urutan
-            </label>
-            <input
-              id="sortOrder"
-              name="sortOrder"
-              type="number"
-              defaultValue={0}
-              className="w-full rounded-lg border border-border px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-            />
-          </div>
-        </div>
+        <p className="text-xs text-text-muted rounded-md border border-border bg-muted/40 px-3 py-2">
+          Urutan otomatis di akhir daftar. Susun ulang dengan drag &amp; drop di halaman
+          Layanan setelah disimpan.
+        </p>
 
         <div>
           <label htmlFor="seoDescription" className="block text-sm font-medium text-text mb-1.5">

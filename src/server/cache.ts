@@ -4,6 +4,8 @@ export const CACHE_TAGS = {
   services: "services",
   faqs: "faqs",
   team: "team",
+  testimonials: "testimonials",
+  articles: "articles",
   pages: "pages",
   landingPages: "landing-pages",
   siteSettings: "site-settings",

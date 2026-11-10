@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import DeleteButton from "@/components/admin/DeleteButton";
-import PublishButton from "@/components/admin/PublishButton";
-import StatusBadge from "@/components/admin/StatusBadge";
+import AdminSortableList from "@/components/admin/AdminSortableList";
 import {
   deleteTeamMember,
   publishTeamMember,
+  reorderTeamMembers,
   unpublishTeamMember,
 } from "@/server/actions/team";
 import { requireAdmin } from "@/server/auth/guard";
@@ -21,7 +20,7 @@ export default async function AdminTimPage() {
         <div>
           <h1 className="font-heading text-2xl font-semibold text-primary">Tim</h1>
           <p className="mt-0.5 text-sm text-text-muted">
-            Kelola profil advokat yang ditampilkan di halaman Tim.
+            Seret baris untuk mengatur urutan profil di halaman Tim.
           </p>
         </div>
         <Link
@@ -38,55 +37,32 @@ export default async function AdminTimPage() {
           <p className="text-sm text-text-muted">Belum ada anggota tim.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-border bg-surface">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-muted">
-                <th className="px-4 py-3 text-left font-semibold text-text">Nama</th>
-                <th className="hidden px-4 py-3 text-left font-semibold text-text md:table-cell">
-                  Jabatan
-                </th>
-                <th className="px-4 py-3 text-left font-semibold text-text">Status</th>
-                <th className="px-4 py-3 text-right font-semibold text-text">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {members.map((member) => (
-                <tr key={member.id} className="transition-colors duration-100 hover:bg-muted/50">
-                  <td className="px-4 py-3 font-medium text-text">{member.name}</td>
-                  <td className="hidden px-4 py-3 text-text-muted md:table-cell">
-                    {member.roleTitle ?? "—"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={member.status} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-2">
-                      <PublishButton
-                        currentStatus={member.status}
-                        action={
-                          member.status === "published"
-                            ? unpublishTeamMember.bind(null, member.id)
-                            : publishTeamMember.bind(null, member.id)
-                        }
-                      />
-                      <Link
-                        href={`/admin/tim/${member.id}`}
-                        className="inline-flex items-center rounded-md border border-primary/20 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/5 transition-colors duration-150"
-                      >
-                        Edit
-                      </Link>
-                      <DeleteButton
-                        action={deleteTeamMember.bind(null, member.id)}
-                        confirmMessage={`Hapus "${member.name}"?`}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <AdminSortableList
+          reorderAction={reorderTeamMembers}
+          columnHeaders={[
+            { label: "Nama" },
+            { label: "Jabatan", className: "hidden md:table-cell" },
+          ]}
+          items={members.map((member) => ({
+            id: member.id,
+            sortOrder: member.sortOrder,
+            status: member.status,
+            label: member.name,
+            editHref: `/admin/tim/${member.id}`,
+            deleteConfirm: `Hapus "${member.name}"?`,
+            cells: [
+              <span key="name" className="font-medium text-text">
+                {member.name}
+              </span>,
+              <span key="role" className="text-text-muted">
+                {member.roleTitle ?? "—"}
+              </span>,
+            ],
+            publishAction: publishTeamMember.bind(null, member.id),
+            unpublishAction: unpublishTeamMember.bind(null, member.id),
+            deleteAction: deleteTeamMember.bind(null, member.id),
+          }))}
+        />
       )}
     </div>
   );

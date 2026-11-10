@@ -4,7 +4,6 @@ import WhatsappCta from "@/components/shared/WhatsappCta";
 import BrandLogo from "@/components/shared/BrandLogo";
 import HomeBrandLink from "@/components/marketing/HomeBrandLink";
 import type { PublicSiteConfig } from "@/lib/content/cms";
-import { siteConfig } from "@/lib/content/site";
 
 const navLinks = [
   { href: "/tentang", label: "Tentang Kami" },
@@ -93,12 +92,40 @@ export default function SiteFooter({ site }: { site: PublicSiteConfig }) {
                 </a>
               </li>
             </ul>
+            {site.instagramUrl || site.facebookUrl ? (
+              <ul className="mt-4 flex flex-wrap gap-3">
+                {site.instagramUrl ? (
+                  <li>
+                    <a
+                      href={site.instagramUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-white/70 hover:text-white transition-colors duration-200 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white rounded-sm"
+                    >
+                      Instagram
+                    </a>
+                  </li>
+                ) : null}
+                {site.facebookUrl ? (
+                  <li>
+                    <a
+                      href={site.facebookUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-white/70 hover:text-white transition-colors duration-200 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white rounded-sm"
+                    >
+                      Facebook
+                    </a>
+                  </li>
+                ) : null}
+              </ul>
+            ) : null}
           </div>
         </div>
 
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-white/45">
           <p>
-            &copy; {new Date().getFullYear()} {siteConfig.name}. Seluruh hak cipta dilindungi.
+            &copy; {new Date().getFullYear()} {site.name}. Seluruh hak cipta dilindungi.
           </p>
           <p className="max-w-md sm:text-right leading-relaxed">
             Informasi di website ini bersifat umum dan tidak merupakan nasihat hukum.

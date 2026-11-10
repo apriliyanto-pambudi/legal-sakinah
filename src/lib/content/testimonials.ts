@@ -21,14 +21,14 @@ export const testimonials: Testimonial[] = [
     quote:
       "Saya tidak tahu harus mulai dari mana. Tim Legal Sakinah meluangkan waktu menjelaskan proses dengan bahasa yang mudah dipahami. Saya merasa didampingi, bukan sekadar dilayani.",
     attribution: "Klien, Jawa Barat",
-    serviceSlug: "perceraian",
+    serviceSlug: "perceraian-muslim",
   },
   {
     id: "t2",
     quote:
       "Yang saya hargai adalah kejujurannya — mereka tidak berjanji hasil yang pasti, tapi menjelaskan apa yang realistis. Itu justru membuat saya lebih percaya.",
     attribution: "Klien, DKI Jakarta",
-    serviceSlug: "hak-asuh-anak",
+    serviceSlug: "perceraian-hak-asuh",
   },
   {
     id: "t3",
@@ -42,28 +42,28 @@ export const testimonials: Testimonial[] = [
     quote:
       "Saya sangat menghargai kerahasiaan yang dijaga selama proses berlangsung. Tidak mudah menceritakan situasi keluarga kepada orang lain.",
     attribution: "Klien, Banten",
-    serviceSlug: "kdrt-perlindungan-hukum",
+    // no matching service in current catalog
   },
   {
     id: "t5",
     quote:
       "Konsultasi awalnya sudah membuat saya lebih tenang. Pilihan hukumnya dijelaskan satu per satu, termasuk risiko yang mungkin muncul.",
     attribution: "Klien, Jawa Timur",
-    serviceSlug: "nafkah-harta-bersama",
+    serviceSlug: "harta-bersama",
   },
   {
     id: "t6",
     quote:
       "Komunikasi responsif dan tidak menghakimi. Saya merasa situasi keluarga saya benar-benar didengar sebelum ada saran langkah.",
     attribution: "Klien, Sumatera Utara",
-    serviceSlug: "perceraian",
+    serviceSlug: "perceraian-muslim",
   },
   {
     id: "t7",
     quote:
       "Dari dokumen hingga jadwal sidang, semuanya diarahkan dengan rapi. Saya tidak merasa sendirian menghadapi proses yang panjang.",
     attribution: "Klien, Sulawesi Selatan",
-    serviceSlug: "waris",
+    // waris ambigu (penetapan / sengketa / pembagian)
   },
 ];
 

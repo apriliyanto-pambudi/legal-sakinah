@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { CheckCircle } from "lucide-react";
 import WhatsappCta from "@/components/shared/WhatsappCta";
 import { siteConfig } from "@/lib/content/site";
 
@@ -7,75 +6,74 @@ interface LpHeroProps {
   headline: string;
   subheadline: string | null;
   ctaText: string;
-  badges: string[];
-  supportingNote: string;
   heroImageUrl?: string | null;
 }
 
 /**
- * Hero LP ads.
+ * Hero LP ads — dua mode:
  *
- * Logo ditampilkan sebagai teks biasa, bukan tautan ke beranda — LP tidak boleh
- * punya jalan keluar selain CTA WhatsApp (design-system/pages/landing-page-ads.md).
- * Jika `heroImageUrl` diisi, banner visual ditampilkan di atas (pola ads Prestige).
+ * 1. VISUAL (heroImageUrl diisi): gambar full-width tanpa crop + strip CTA di bawah.
+ *    Headline/subheadline tidak ditampilkan HTML karena sudah baked di gambar.
+ *
+ * 2. TEKS (tanpa heroImageUrl): atmosphere background dengan teks penuh.
+ *
+ * shortcut: badge/supportingNote disembunyikan — unhide di UI + admin kalau trust signal dibutuhkan lagi.
  */
 export default function LpHero({
+  ctaText,
+  heroImageUrl,
   headline,
   subheadline,
-  ctaText,
-  badges,
-  supportingNote,
-  heroImageUrl,
 }: LpHeroProps) {
-  return (
-    <section className="ls-atmosphere overflow-hidden">
-      {heroImageUrl ? (
-        <div className="relative w-full aspect-[16/9] max-h-[420px] bg-primary/40">
+  /* ── Mode visual (ada banner) ─────────────────────────────────────── */
+  if (heroImageUrl) {
+    return (
+      <section>
+        {/* Gambar full-width, tidak di-crop — natural height */}
+        <div className="max-w-[480px] mx-auto">
           <Image
             src={heroImageUrl}
             alt=""
-            fill
+            width={900}
+            height={900}
             priority
-            className="object-cover"
-            sizes="100vw"
+            className="w-full h-auto block"
+            sizes="(max-width: 480px) 100vw, 480px"
           />
         </div>
-      ) : null}
 
-      <div className="relative max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-14 md:pt-12 md:pb-20">
+        {/* Strip CTA — tombol saja */}
+        <div className="bg-primary text-white py-8 px-4">
+          <div className="max-w-[480px] mx-auto text-center">
+            <WhatsappCta ctaLabel="hero_wa" className="text-base px-6 py-3.5 shadow-md w-full justify-center sm:w-auto">
+              {ctaText}
+            </WhatsappCta>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  /* ── Mode teks (tanpa banner) ─────────────────────────────────────── */
+  return (
+    <section className="ls-atmosphere overflow-hidden">
+      <div className="relative max-w-[480px] mx-auto px-4 pt-8 pb-14 md:pt-12 md:pb-20">
         <p className="font-heading text-xl font-semibold tracking-tight mb-1 text-white">
           {siteConfig.name}
         </p>
         <p className="ls-motto text-accent text-sm mb-10 md:mb-14">{siteConfig.motto}</p>
 
-        <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight mb-5">
+        <h1 className="font-heading text-3xl sm:text-4xl font-semibold leading-tight mb-5">
           {headline}
         </h1>
 
         {subheadline && (
-          <p className="text-white/80 text-base sm:text-lg leading-relaxed mb-8">
-            {subheadline}
-          </p>
+          <p className="text-white/80 text-base leading-relaxed mb-8">{subheadline}</p>
         )}
 
         <WhatsappCta ctaLabel="hero_wa" className="text-base px-6 py-3.5 shadow-md">
           {ctaText}
         </WhatsappCta>
-
-        {supportingNote ? (
-          <p className="text-white/60 text-sm mt-4">{supportingNote}</p>
-        ) : null}
-
-        {badges.length > 0 ? (
-          <ul className="flex flex-wrap gap-x-5 gap-y-2 mt-8 pt-6 border-t border-white/15">
-            {badges.map((badge) => (
-              <li key={badge} className="flex items-center gap-2 text-sm text-white/75">
-                <CheckCircle className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
-                {badge}
-              </li>
-            ))}
-          </ul>
-        ) : null}
       </div>
     </section>
   );

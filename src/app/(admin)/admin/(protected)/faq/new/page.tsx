@@ -85,18 +85,10 @@ export default async function NewFaqPage({ searchParams }: Props) {
           </div>
         </div>
 
-        <div>
-          <label htmlFor="sortOrder" className="block text-sm font-medium text-text mb-1.5">
-            Urutan
-          </label>
-          <input
-            id="sortOrder"
-            name="sortOrder"
-            type="number"
-            defaultValue={0}
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-          />
-        </div>
+        <p className="text-xs text-text-muted rounded-md border border-border bg-muted/40 px-3 py-2">
+          Urutan otomatis di akhir daftar. Susun ulang dengan drag &amp; drop di
+          halaman FAQ setelah disimpan.
+        </p>
 
         <div className="flex items-center justify-end gap-3 pt-2 border-t border-border">
           <Link href="/admin/faq" className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-muted hover:bg-muted transition-colors duration-150">

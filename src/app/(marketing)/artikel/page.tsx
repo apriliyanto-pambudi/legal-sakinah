@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import PageHero from "@/components/marketing/PageHero";
-import {
-  formatArticleDate,
-  getPublishedArticles,
-} from "@/lib/content/articles";
+import { formatArticleDate } from "@/lib/content/articles";
+import { getPublicArticles } from "@/lib/content/cms";
 import { siteConfig } from "@/lib/content/site";
 
 export const metadata: Metadata = {
@@ -22,8 +20,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ArtikelListPage() {
-  const list = getPublishedArticles();
+export default async function ArtikelListPage() {
+  const list = await getPublicArticles();
 
   return (
     <>

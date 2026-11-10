@@ -67,7 +67,7 @@ export default function WhatsappCta({
       target={openInNewTab ? "_blank" : undefined}
       rel="noopener noreferrer"
       onClick={() => trackCtaClick(ctaLabel, resolvedLpSlug)}
-      className={`inline-flex items-center gap-2 min-h-11 bg-cta text-cta-foreground font-semibold rounded-md px-5 py-3 transition-colors duration-200 hover:bg-cta-hover cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta ${className}`}
+      className={`inline-flex items-center justify-center gap-2 min-h-11 bg-cta text-cta-foreground font-semibold rounded-md px-5 py-3 transition-colors duration-200 hover:bg-cta-hover cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta ${className}`}
     >
       {/* Glyph WhatsApp resmi — SVG, bukan emoji */}
       <svg

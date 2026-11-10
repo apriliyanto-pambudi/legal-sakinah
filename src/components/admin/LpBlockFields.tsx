@@ -1,3 +1,4 @@
+import PhotoUploadField from "@/components/admin/PhotoUploadField";
 import {
   adminInputClass,
   adminLabelClass,
@@ -37,15 +38,11 @@ export default function LpBlockFields({
   const data = (content && typeof content === "object" ? content : {}) as JsonRecord;
 
   if (blockType === "hero") {
+    // shortcut: badge/note UI hidden — banner & CTA di pengaturan halaman
     return (
-      <>
-        <Field label="Badge kredibilitas" name="badges" hint="Satu baris per badge">
-          <textarea name="badges" rows={4} defaultValue={asLines(data.badges)} className={`${adminInputClass} resize-y`} />
-        </Field>
-        <Field label="Catatan pendukung" name="supportingNote">
-          <textarea name="supportingNote" rows={2} defaultValue={asString(data.supportingNote)} className={`${adminInputClass} resize-y`} />
-        </Field>
-      </>
+      <p className="text-sm text-[var(--color-muted)]">
+        Tidak ada field di blok ini. Banner dan teks CTA diatur di pengaturan halaman di atas.
+      </p>
     );
   }
 
@@ -154,28 +151,66 @@ export default function LpBlockFields({
   }
 
   if (blockType === "image_cards") {
+    const existing = Array.isArray(data.cards)
+      ? data.cards.filter(
+          (item): item is JsonRecord => !!item && typeof item === "object"
+        )
+      : [];
+    // Satu slot kosong di akhir untuk menambah foto.
+    const slots: JsonRecord[] = [...existing, { imageUrl: "" }];
+
     return (
       <>
-        <Text name="eyebrow" label="Eyebrow" value={asString(data.eyebrow)} />
-        <Text name="title" label="Judul section" value={asString(data.title)} />
-        <Field
-          label="Kartu foto"
-          name="cards"
-          hint="Satu baris per kartu. Format: URL gambar || Judul || Caption || Teks CTA"
-        >
-          <textarea
-            name="cards"
-            rows={8}
-            defaultValue={asImageCards(data.cards)}
-            className={`${adminInputClass} resize-y font-mono text-sm`}
-          />
-        </Field>
+        <p className="text-xs text-text-muted -mt-1 mb-1">
+          Mirip Prestige: unggah foto bertumpuk. Teks biasanya sudah di dalam gambar.
+        </p>
+        <input type="hidden" name="cardCount" value={slots.length} />
+        <div className="space-y-4">
+          {slots.map((card, i) => {
+            const imageUrl = asString(card.imageUrl);
+            const isBlank = !imageUrl;
+            return (
+              <div
+                key={i}
+                className="space-y-3 rounded-lg border border-border bg-muted/40 p-4"
+              >
+                <p className="text-sm font-medium text-primary">
+                  {isBlank ? "Foto baru" : `Foto ${i + 1}`}
+                </p>
+                <PhotoUploadField
+                  currentUrl={imageUrl || null}
+                  label="Gambar"
+                  fileInputName={`cardImage_${i}`}
+                  hiddenName={`cardImageUrl_${i}`}
+                  hint="JPEG, PNG, atau WebP · Maks 5 MB"
+                  previewClassName="h-40 w-full max-w-sm"
+                  alt={`Foto ${i + 1}`}
+                />
+                {isBlank ? (
+                  <p className="text-xs text-text-muted">
+                    Pilih gambar lalu Simpan blok untuk menambah foto.
+                  </p>
+                ) : (
+                  <label className="flex items-center gap-2 text-sm text-red-600">
+                    <input
+                      type="checkbox"
+                      name={`cardRemove_${i}`}
+                      value="1"
+                      className="rounded border-border"
+                    />
+                    Hapus foto ini
+                  </label>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </>
     );
   }
 
   return (
-    <Field label="HTML kustom" name="html">
+    <Field label="HTML kustom (khusus developer)" name="html">
       <textarea
         name="html"
         rows={8}
@@ -184,23 +219,6 @@ export default function LpBlockFields({
       />
     </Field>
   );
-}
-
-function asImageCards(value: unknown): string {
-  if (!Array.isArray(value)) return "";
-  return value
-    .map((item) => {
-      if (!item || typeof item !== "object") return "";
-      const record = item as JsonRecord;
-      return [
-        asString(record.imageUrl),
-        asString(record.title),
-        asString(record.caption),
-        asString(record.ctaText),
-      ].join(" || ");
-    })
-    .filter(Boolean)
-    .join("\n");
 }
 
 function Field({

@@ -6,17 +6,17 @@
 
 :root {
   /* ── Brand ───────────────────────────────────────── */
-  /* Deep ink-teal: tenang, berwibawa, bukan navy korporat keras */
-  --color-primary:            #0e2f3a;
+  /* Teal logo-aligned: berwibawa, sedikit lebih hidup dari ink-teal lama */
+  --color-primary:            #114851;
   --color-primary-foreground: #f7faf8;
-  --color-secondary:          #1a4a52;
+  --color-secondary:          #1f5c66;
   --color-secondary-foreground: #f7faf8;
 
-  /* CTA — trust gold (bukan orange agresif) */
-  --color-accent:             #a16207;
-  --color-cta:                #a16207;
+  /* CTA — oranye-emas hangat (dekat logo "Legal"), tetap profesional */
+  --color-accent:             #c9840f;
+  --color-cta:                #c9840f;
   --color-cta-foreground:     #ffffff;
-  --color-cta-hover:          #854d0e;
+  --color-cta-hover:          #a66a0c;
 
   /* ── Surfaces ────────────────────────────────────── */
   --color-background:         #f2f5f3; /* sage mist */
@@ -29,15 +29,15 @@
   --color-text-muted:         #4a5c57;
 
   /* ── Atmosphere accents (hero/band) ───────────────── */
-  --color-hero-glow:          rgba(161, 98, 7, 0.18);
-  --color-hero-mist:          rgba(26, 74, 82, 0.45);
+  --color-hero-glow:          rgba(201, 132, 15, 0.22);
+  --color-hero-mist:          rgba(31, 92, 102, 0.45);
 
   /* ── Status ──────────────────────────────────────── */
   --color-success-soft:       #ecfdf5;
 
   /* ── Typography ──────────────────────────────────── */
-  --font-heading: "EB Garamond", ui-serif, Georgia, serif;
-  --font-body:    "Lato", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Fraunces", ui-serif, Georgia, serif;
+  --font-body:    "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
   /* ── Radius ──────────────────────────────────────── */
   --radius-sm:  4px;

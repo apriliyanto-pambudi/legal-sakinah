@@ -4,11 +4,8 @@ import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import PageHero from "@/components/marketing/PageHero";
 import WhatsappCta from "@/components/shared/WhatsappCta";
-import {
-  formatArticleDate,
-  getArticleBySlug,
-  getPublishedArticles,
-} from "@/lib/content/articles";
+import { formatArticleDate } from "@/lib/content/articles";
+import { getPublicArticles, getPublicArticleBySlug } from "@/lib/content/cms";
 import { siteConfig } from "@/lib/content/site";
 
 interface Props {
@@ -16,12 +13,13 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  return getPublishedArticles().map((a) => ({ slug: a.slug }));
+  const articles = await getPublicArticles();
+  return articles.map((a) => ({ slug: a.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
+  const article = await getPublicArticleBySlug(slug);
   if (!article) return { title: "Tidak Ditemukan" };
 
   return {
@@ -40,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ArtikelDetailPage({ params }: Props) {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
+  const article = await getPublicArticleBySlug(slug);
   if (!article) notFound();
 
   return (

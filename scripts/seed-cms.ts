@@ -13,7 +13,7 @@ config({ path: ".env.local" });
 config({ path: ".env" });
 
 async function main() {
-  const { isNull } = await import("drizzle-orm");
+  const { eq, isNull } = await import("drizzle-orm");
   const { db, schema } = await import("../src/server/db");
   const { faqItems } = await import("../src/lib/content/faq");
   const {
@@ -23,6 +23,8 @@ async function main() {
   const { services } = await import("../src/lib/content/services");
   const { siteConfig } = await import("../src/lib/content/site");
   const { teamMembers } = await import("../src/lib/content/team");
+  const { articles } = await import("../src/lib/content/articles");
+  const { testimonials } = await import("../src/lib/content/testimonials");
 
   for (const service of services) {
     await db
@@ -40,6 +42,26 @@ async function main() {
         publishedAt: new Date(),
       })
       .onConflictDoNothing({ target: schema.services.slug });
+  }
+
+  const existingArticles = await db
+    .select({ slug: schema.articles.slug })
+    .from(schema.articles)
+    .where(isNull(schema.articles.deletedAt));
+  const articleSlugs = new Set(existingArticles.map((row) => row.slug));
+
+  for (const article of articles) {
+    if (articleSlugs.has(article.slug)) continue;
+    await db.insert(schema.articles).values({
+      slug: article.slug,
+      title: article.title,
+      excerpt: article.excerpt,
+      content: article.content.trim(),
+      seoTitle: article.seoTitle ?? null,
+      seoDescription: article.seoDescription ?? null,
+      status: "published",
+      publishedAt: new Date(article.publishedAt),
+    });
   }
 
   const existingFaqs = await db
@@ -77,6 +99,40 @@ async function main() {
       sortOrder: member.sortOrder,
       status: "published",
     });
+  }
+
+  const existingTestimonials = await db
+    .select({ quote: schema.testimonials.quote })
+    .from(schema.testimonials)
+    .where(isNull(schema.testimonials.deletedAt));
+  const testimonialQuotes = new Set(
+    existingTestimonials.map((row) => row.quote)
+  );
+
+  for (const [index, item] of testimonials.entries()) {
+    if (testimonialQuotes.has(item.quote)) continue;
+    await db.insert(schema.testimonials).values({
+      quote: item.quote,
+      attribution: item.attribution,
+      serviceSlug: item.serviceSlug ?? null,
+      sortOrder: index + 1,
+      status: "published",
+    });
+  }
+
+  // Selaraskan slug layanan lama di testimoni yang sudah ada
+  const legacyServiceSlugs: Record<string, string | null> = {
+    perceraian: "perceraian-muslim",
+    "hak-asuh-anak": "perceraian-hak-asuh",
+    "nafkah-harta-bersama": "harta-bersama",
+    "kdrt-perlindungan-hukum": null,
+    waris: null,
+  };
+  for (const [from, to] of Object.entries(legacyServiceSlugs)) {
+    await db
+      .update(schema.testimonials)
+      .set({ serviceSlug: to, updatedAt: new Date() })
+      .where(eq(schema.testimonials.serviceSlug, from));
   }
 
   const staticPages = [
@@ -143,6 +199,26 @@ async function main() {
     ["contact_email", siteConfig.email],
     ["site_name", siteConfig.name],
     ["site_tagline", siteConfig.tagline],
+    ["site_motto", siteConfig.motto],
+    ["site_description", siteConfig.description],
+    ["instagram_url", siteConfig.socialLinks.instagram],
+    ["facebook_url", siteConfig.socialLinks.facebook],
+    // Hero beranda — sinkron dengan fallback di cms.ts
+    [
+      "hero_headline",
+      "Pendampingan hukum keluarga yang tenang, jujur, dan dapat dipercaya.",
+    ],
+    [
+      "hero_description",
+      "Spesialis perkara perceraian, hak asuh anak, harta bersama, isbat nikah, waris, dan perlindungan hukum keluarga — didampingi dengan kepekaan terhadap situasi yang sensitif.",
+    ],
+    [
+      "hero_supporting_text",
+      "Langkah pertama adalah percakapan. Tanpa tekanan, tanpa komitmen.",
+    ],
+    ["hero_cta_text", "Konsultasi via WhatsApp"],
+    ["hero_photo_url", ""],
+    ["mid_cta_photo_url", ""],
   ];
 
   for (const [key, value] of settings) {

@@ -57,6 +57,60 @@ export default async function AdminPengaturanPage({ searchParams }: Props) {
           />
         </div>
         <div>
+          <label htmlFor="site_motto" className={adminLabelClass}>
+            Motto
+          </label>
+          <input
+            id="site_motto"
+            name="site_motto"
+            type="text"
+            defaultValue={settings.site_motto || "Amanah Menuntaskan"}
+            className={adminInputClass}
+            placeholder="Amanah Menuntaskan"
+          />
+        </div>
+        <div>
+          <label htmlFor="site_description" className={adminLabelClass}>
+            Deskripsi situs
+          </label>
+          <textarea
+            id="site_description"
+            name="site_description"
+            rows={4}
+            defaultValue={settings.site_description}
+            className={`${adminInputClass} resize-y`}
+            placeholder="Deskripsi singkat untuk SEO dan ringkasan situs"
+          />
+        </div>
+        <div>
+          <label htmlFor="instagram_url" className={adminLabelClass}>
+            Instagram URL{" "}
+            <span className="font-normal text-text-muted">(opsional)</span>
+          </label>
+          <input
+            id="instagram_url"
+            name="instagram_url"
+            type="url"
+            defaultValue={settings.instagram_url}
+            className={adminInputClass}
+            placeholder="https://instagram.com/..."
+          />
+        </div>
+        <div>
+          <label htmlFor="facebook_url" className={adminLabelClass}>
+            Facebook URL{" "}
+            <span className="font-normal text-text-muted">(opsional)</span>
+          </label>
+          <input
+            id="facebook_url"
+            name="facebook_url"
+            type="url"
+            defaultValue={settings.facebook_url}
+            className={adminInputClass}
+            placeholder="https://facebook.com/..."
+          />
+        </div>
+        <div>
           <label htmlFor="whatsapp_number_default" className={adminLabelClass}>
             Nomor WhatsApp default
           </label>

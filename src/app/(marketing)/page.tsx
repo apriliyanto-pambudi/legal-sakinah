@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Scale,
@@ -21,30 +22,33 @@ import Reveal from "@/components/marketing/Reveal";
 import PortraitDummy from "@/components/marketing/PortraitDummy";
 import TestimonialCarousel from "@/components/marketing/TestimonialCarousel";
 import {
+  getPublicArticles,
   getPublicFaqs,
+  getPublicHomeHero,
   getPublicServices,
+  getPublicSiteConfig,
   getPublicTeam,
+  getPublicTestimonials,
 } from "@/lib/content/cms";
-import {
-  formatArticleDate,
-  getPublishedArticles,
-} from "@/lib/content/articles";
-import { getTestimonials } from "@/lib/content/testimonials";
+import { formatArticleDate } from "@/lib/content/articles";
 import { displayServicePrice } from "@/lib/content/services";
-import { siteConfig } from "@/lib/content/site";
+import { photoFocusObjectClass } from "@/lib/content/team";
 
-export const metadata: Metadata = {
-  title: `${siteConfig.name} — ${siteConfig.motto}`,
-  description: siteConfig.description,
-  openGraph: {
-    title: `${siteConfig.name} — ${siteConfig.motto}`,
-    description: siteConfig.description,
-    url: siteConfig.url,
-    siteName: siteConfig.name,
-    locale: "id_ID",
-    type: "website",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getPublicSiteConfig();
+  return {
+    title: `${site.name} — ${site.motto}`,
+    description: site.description,
+    openGraph: {
+      title: `${site.name} — ${site.motto}`,
+      description: site.description,
+      url: site.url,
+      siteName: site.name,
+      locale: "id_ID",
+      type: "website",
+    },
+  };
+}
 
 const iconMap: Record<string, React.ElementType> = {
   Scale,
@@ -54,13 +58,6 @@ const iconMap: Record<string, React.ElementType> = {
   Users,
   Shield,
 };
-
-/** 3 litigasi yang paling sering dicari */
-const FEATURED_SLUGS = [
-  "perceraian-muslim",
-  "perceraian-hak-asuh",
-  "harta-bersama",
-];
 
 const values = [
   {
@@ -81,22 +78,23 @@ const values = [
 ];
 
 export default async function BerandaPage() {
-  const [services, faqs, team] = await Promise.all([
-    getPublicServices(),
-    getPublicFaqs(),
-    getPublicTeam(),
-  ]);
-  const testimonials = getTestimonials().slice(0, 7);
+  const [services, faqs, team, hero, testimonialsAll, articlesAll, site] =
+    await Promise.all([
+      getPublicServices(),
+      getPublicFaqs(),
+      getPublicTeam(),
+      getPublicHomeHero(),
+      getPublicTestimonials(),
+      getPublicArticles(),
+      getPublicSiteConfig(),
+    ]);
+  const testimonials = testimonialsAll.slice(0, 7);
   const faqPreview = faqs.slice(0, 4);
-  const articlePreview = getPublishedArticles().slice(0, 3);
+  const articlePreview = articlesAll.slice(0, 3);
 
-  const featured = FEATURED_SLUGS.map((slug) =>
-    services.find((s) => s.slug === slug)
-  ).filter(Boolean) as typeof services;
-  const featuredIds = new Set(featured.map((s) => s.slug));
-  const otherServices = services
-    .filter((s) => !featuredIds.has(s.slug) && s.category === "litigasi")
-    .slice(0, 3);
+  // Urutan CMS naik: 3 pertama = kartu utama; 3 berikutnya = baris bawah
+  const featured = services.slice(0, 3);
+  const otherServices = services.slice(3, 6);
   const teamPreview = team.slice(0, 3);
 
   return (
@@ -109,26 +107,26 @@ export default async function BerandaPage() {
             {/* Copy — brand first, kiri */}
             <div>
               <p className="ls-rise font-heading text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-white tracking-tight">
-                {siteConfig.name}
+                {site.name}
               </p>
               <p className="ls-rise ls-rise-delay-1 ls-motto text-accent text-xl mt-2 mb-5">
-                {siteConfig.motto}
+                {site.motto}
               </p>
               <div className="ls-rise ls-rise-delay-1 ls-rule mb-6" aria-hidden="true" />
               <h1 className="ls-rise ls-rise-delay-2 font-heading text-2xl sm:text-3xl md:text-[2.15rem] font-semibold text-white leading-snug mb-5">
-                Pendampingan hukum keluarga yang tenang, jujur, dan dapat dipercaya.
+                {hero.headline}
               </h1>
               <p className="ls-rise ls-rise-delay-2 text-white/75 text-base leading-relaxed mb-4 max-w-lg">
-                Spesialis perkara perceraian, hak asuh anak, harta bersama, isbat nikah, waris,
-                dan perlindungan hukum keluarga — didampingi dengan kepekaan terhadap situasi
-                yang sensitif.
+                {hero.description}
               </p>
-              <p className="ls-rise ls-rise-delay-2 text-white/55 text-sm mb-8 max-w-lg">
-                Langkah pertama adalah percakapan. Tanpa tekanan, tanpa komitmen.
-              </p>
+              {hero.supportingText ? (
+                <p className="ls-rise ls-rise-delay-2 text-white/55 text-sm mb-8 max-w-lg">
+                  {hero.supportingText}
+                </p>
+              ) : null}
               <div className="ls-rise ls-rise-delay-3 flex flex-col sm:flex-row gap-3">
                 <WhatsappCta ctaLabel="hero_wa" className="text-base px-6 py-3.5 shadow-md">
-                  Konsultasi via WhatsApp
+                  {hero.ctaText}
                 </WhatsappCta>
                 <Link
                   href="/layanan"
@@ -140,10 +138,21 @@ export default async function BerandaPage() {
               </div>
             </div>
 
-            {/* Portrait dummy — ganti PortraitDummy dengan foto asli nanti */}
+            {/* Portrait — pakai foto CMS, fallback PortraitDummy */}
             <div className="ls-rise ls-rise-delay-2 relative mx-auto w-full max-w-[20rem] sm:max-w-sm lg:max-w-none lg:justify-self-end">
               <div className="ls-portrait-presence relative mx-auto aspect-[3/4] w-full max-w-md overflow-hidden rounded-sm">
-                <PortraitDummy fill label="Foto advokat (dummy)" />
+                {hero.photoUrl ? (
+                  <Image
+                    src={hero.photoUrl}
+                    alt="Foto advokat"
+                    fill
+                    className="object-cover"
+                    priority
+                    sizes="(max-width: 640px) 20rem, (max-width: 1024px) 24rem, 28rem"
+                  />
+                ) : (
+                  <PortraitDummy fill label="Foto advokat (dummy)" />
+                )}
               </div>
             </div>
           </div>
@@ -164,7 +173,7 @@ export default async function BerandaPage() {
           </Reveal>
 
           <Reveal stagger className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {(featured.length > 0 ? featured : services.slice(0, 3)).map((service) => {
+            {featured.map((service) => {
               const Icon = iconMap[service.icon] ?? Scale;
               return (
                 <Link
@@ -248,7 +257,7 @@ export default async function BerandaPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <Reveal stagger className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div>
-              <p className="ls-motto text-accent text-sm mb-2">{siteConfig.motto}</p>
+              <p className="ls-motto text-accent text-sm mb-2">{site.motto}</p>
               <div className="ls-rule mb-4" aria-hidden="true" />
               <h2 className="font-heading text-3xl md:text-4xl font-semibold text-primary mb-4">
                 Konsultasi via WhatsApp atau atur pertemuan
@@ -263,7 +272,17 @@ export default async function BerandaPage() {
             </div>
             <div className="relative mx-auto w-full max-w-md">
               <div className="relative aspect-square rounded-xl overflow-hidden shadow-lg ring-1 ring-border/60">
-                <PortraitDummy fill label="Foto konsultasi (dummy)" />
+                {hero.midCtaPhotoUrl ? (
+                  <Image
+                    src={hero.midCtaPhotoUrl}
+                    alt="Ilustrasi konsultasi hukum keluarga"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 28rem"
+                  />
+                ) : (
+                  <PortraitDummy fill label="Foto konsultasi (dummy)" />
+                )}
               </div>
               <p className="mt-3 text-center text-xs text-text-muted">
                 Percakapan awal via WhatsApp — tanpa komitmen
@@ -314,7 +333,7 @@ export default async function BerandaPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <Reveal stagger className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             <div>
-              <p className="ls-motto text-accent text-sm mb-2">Mengapa {siteConfig.shortName}</p>
+              <p className="ls-motto text-accent text-sm mb-2">Mengapa {site.name}</p>
               <div className="ls-rule mb-4" aria-hidden="true" />
               <h2 className="font-heading text-3xl md:text-4xl font-semibold text-primary mb-5">
                 Hadir saat Anda paling membutuhkan kepastian
@@ -384,7 +403,7 @@ export default async function BerandaPage() {
                       <img
                         src={member.photoUrl}
                         alt={`Foto ${member.name}`}
-                        className="w-full h-full object-cover"
+                        className={`w-full h-full object-cover ${photoFocusObjectClass(member.photoFocus)}`}
                       />
                     ) : (
                       <div className="flex flex-col items-center gap-2 text-text-muted">
@@ -505,7 +524,7 @@ export default async function BerandaPage() {
       <section className="py-16 md:py-20 bg-background border-t border-border">
         <Reveal>
           <div id="kontak" className="ls-anchor max-w-3xl mx-auto px-4 sm:px-6 text-center">
-            <p className="ls-motto text-accent text-lg mb-3">{siteConfig.motto}</p>
+            <p className="ls-motto text-accent text-lg mb-3">{site.motto}</p>
             <div className="ls-rule mx-auto mb-5" aria-hidden="true" />
             <h2 className="font-heading text-3xl md:text-4xl font-semibold mb-4 text-primary">
               Siap memulai percakapan?

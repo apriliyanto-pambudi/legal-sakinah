@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { siteConfig } from "@/lib/content/site";
+import { getPublicSiteConfig } from "@/lib/content/cms";
 
 interface Crumb {
   href?: string;
@@ -13,12 +13,14 @@ interface PageHeroProps {
   compact?: boolean;
 }
 
-export default function PageHero({
+export default async function PageHero({
   title,
   description,
   crumbs,
   compact = false,
 }: PageHeroProps) {
+  const site = await getPublicSiteConfig();
+
   return (
     <section
       className={`ls-atmosphere ${compact ? "py-12 md:py-16" : "py-14 md:py-20"}`}
@@ -54,7 +56,7 @@ export default function PageHero({
         ) : null}
 
         <p className="ls-motto text-accent text-sm md:text-base mb-3">
-          {siteConfig.motto}
+          {site.motto}
         </p>
         <div className="ls-rule mb-5" aria-hidden="true" />
         <h1
