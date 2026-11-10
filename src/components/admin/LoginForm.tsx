@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { signIn } from "@/lib/auth-client";
 
 export default function LoginForm() {
@@ -11,6 +12,7 @@ export default function LoginForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(
     searchParams.get("error") === "forbidden"
       ? "Akun Anda tidak memiliki akses ke panel admin."
@@ -70,16 +72,30 @@ export default function LoginForm() {
         <label htmlFor="password" className="text-sm font-medium text-text">
           Password
         </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="rounded-md border border-border bg-surface px-3 py-2.5 text-base text-text transition-colors duration-200 focus:border-primary focus:outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
-        />
+        <div className="relative">
+          <input
+            id="password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-md border border-border bg-surface px-3 py-2.5 pr-11 text-base text-text transition-colors duration-200 focus:border-primary focus:outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1.5 text-text-muted hover:text-primary cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <Eye className="h-4 w-4" aria-hidden="true" />
+            )}
+          </button>
+        </div>
       </div>
 
       <button

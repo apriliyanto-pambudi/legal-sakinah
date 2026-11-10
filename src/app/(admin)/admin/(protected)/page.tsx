@@ -29,6 +29,7 @@ const cards = [
 const staticLinks = [
   { href: "/admin/beranda", label: "Beranda", desc: "Headline, deskripsi, CTA, dan foto hero." },
   { href: "/admin/pengaturan", label: "Pengaturan", desc: "Nomor WhatsApp, prefill, dan info kontak." },
+  { href: "/admin/akun", label: "Akun", desc: "Ganti password admin." },
 ] as const;
 
 export default async function AdminHomePage() {

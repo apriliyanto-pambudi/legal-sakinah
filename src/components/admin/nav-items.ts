@@ -9,6 +9,7 @@ export const ADMIN_NAV = [
   { label: "Artikel", href: "/admin/artikel" },
   { label: "Landing Pages", href: "/admin/landing-pages" },
   { label: "Pengaturan", href: "/admin/pengaturan" },
+  { label: "Akun", href: "/admin/akun" },
 ] as const;
 
 export function isAdminNavActive(pathname: string, href: string): boolean {
