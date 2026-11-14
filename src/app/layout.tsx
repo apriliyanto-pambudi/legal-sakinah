@@ -48,8 +48,11 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
   ),
   icons: {
-    icon: "/images/logo-mark.png",
-    apple: "/images/logo-mark.png",
+    icon: [
+      { url: "/favicon.png", sizes: "48x48", type: "image/png" },
+      { url: "/images/favicon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/images/favicon-512.png", sizes: "512x512", type: "image/png" }],
   },
 };
 
