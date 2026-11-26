@@ -14,7 +14,8 @@ declare global {
       track: (event: string, payload?: Record<string, unknown>) => void;
     };
     gtag?: (...args: unknown[]) => void;
-    dataLayer?: unknown[];
+    // Samakan dengan deklarasi global gtag/Next (Object[]), jangan unknown[].
+    dataLayer?: Object[];
     __LS_LP_ADS__?: LpAdsPixelIds;
   }
 }
