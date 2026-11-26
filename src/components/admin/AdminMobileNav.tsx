@@ -18,6 +18,7 @@ export default function AdminMobileNav() {
           <Link
             key={item.href}
             href={item.href}
+            prefetch
             aria-current={active ? "page" : undefined}
             className={`shrink-0 rounded-md px-3 py-2 text-sm transition-colors duration-200 cursor-pointer ${
               active
