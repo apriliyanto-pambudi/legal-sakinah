@@ -9,6 +9,12 @@ import { isUniqueViolation, zodErrorMessage } from "@/lib/validations/form-error
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { saveLpBanner } from "@/lib/upload";
+import {
+  formatLpDuplicateInternalName,
+  lpDuplicateBaseInternalName,
+  lpDuplicateBaseSlug,
+  nextLpDuplicateSlug,
+} from "@/lib/lp-duplicate-slug";
 
 /** Digits only; leading 08 → 62. Empty → undefined (pakai default situs). */
 function normalizeWaOverride(raw: string | undefined): string | undefined {
@@ -388,15 +394,25 @@ export async function duplicateLandingPage(id: string) {
   const original = rows[0];
   if (!original) redirect("/admin/landing-pages");
 
-  const newSlug = `${original.slug}-copy-${Date.now().toString(36)}`;
+  const baseSlug = lpDuplicateBaseSlug(original.slug);
+  const existing = await db
+    .select({ slug: schema.landingPages.slug })
+    .from(schema.landingPages)
+    .where(isNull(schema.landingPages.deletedAt));
+  const { slug: newSlug, n: copyN } = nextLpDuplicateSlug(
+    baseSlug,
+    existing.map((r) => r.slug),
+  );
+  const newInternalName = formatLpDuplicateInternalName(
+    lpDuplicateBaseInternalName(original.internalName),
+    copyN,
+  );
 
   const inserted = await db
     .insert(schema.landingPages)
     .values({
       slug: newSlug,
-      internalName: original.internalName
-        ? `${original.internalName} (kopi)`
-        : null,
+      internalName: newInternalName,
       headline: original.headline,
       subheadline: original.subheadline,
       heroImageUrl: original.heroImageUrl,

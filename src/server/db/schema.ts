@@ -368,7 +368,8 @@ export const mediaAssets = pgTable("media_assets", {
 /**
  * Site settings — key-value.
  * Kunci minimal: whatsapp_number_default, whatsapp_prefill_default,
- * ga4_measurement_id, meta_pixel_id, office_address, office_hours,
+ * ga4_measurement_id, meta_pixel_id, google_ads_id, tiktok_pixel_id,
+ * office_address, office_hours,
  * contact_email, site_motto, site_description, instagram_url, facebook_url,
  * hero_*, mid_cta_photo_url.
  */

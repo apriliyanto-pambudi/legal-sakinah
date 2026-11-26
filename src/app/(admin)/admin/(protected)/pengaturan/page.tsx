@@ -174,6 +174,13 @@ export default async function AdminPengaturanPage({ searchParams }: Props) {
             className={adminInputClass}
           />
         </div>
+        <div className="border-t border-border pt-4">
+          <p className="text-sm font-medium text-primary">Tracking iklan (Landing Page saja)</p>
+          <p className="mt-1 text-xs text-text-muted">
+            ID di bawah hanya aktif di LP: PageView saat buka halaman, Lead saat klik WhatsApp.
+            Kosongkan field yang tidak dipakai. Compro tidak mengirim event ini.
+          </p>
+        </div>
         <div>
           <label htmlFor="ga4_measurement_id" className={adminLabelClass}>
             GA4 Measurement ID
@@ -184,7 +191,9 @@ export default async function AdminPengaturanPage({ searchParams }: Props) {
             type="text"
             defaultValue={settings.ga4_measurement_id}
             className={`${adminInputClass} font-mono`}
+            placeholder="G-XXXXXXXX"
           />
+          <p className="mt-1 text-xs text-text-muted">Opsional / cadangan. Utama iklan: tiga field di bawah.</p>
         </div>
         <div>
           <label htmlFor="meta_pixel_id" className={adminLabelClass}>
@@ -196,6 +205,33 @@ export default async function AdminPengaturanPage({ searchParams }: Props) {
             type="text"
             defaultValue={settings.meta_pixel_id}
             className={`${adminInputClass} font-mono`}
+            placeholder="123456789012345"
+          />
+        </div>
+        <div>
+          <label htmlFor="google_ads_id" className={adminLabelClass}>
+            Google Ads ID
+          </label>
+          <input
+            id="google_ads_id"
+            name="google_ads_id"
+            type="text"
+            defaultValue={settings.google_ads_id}
+            className={`${adminInputClass} font-mono`}
+            placeholder="AW-XXXXXXXXX"
+          />
+        </div>
+        <div>
+          <label htmlFor="tiktok_pixel_id" className={adminLabelClass}>
+            TikTok Pixel ID
+          </label>
+          <input
+            id="tiktok_pixel_id"
+            name="tiktok_pixel_id"
+            type="text"
+            defaultValue={settings.tiktok_pixel_id}
+            className={`${adminInputClass} font-mono`}
+            placeholder="CXXXXXXXXXXXXXXX"
           />
         </div>
         <div className="flex justify-end border-t border-border pt-2">

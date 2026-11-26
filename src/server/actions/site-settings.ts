@@ -11,6 +11,8 @@ const SETTING_KEYS = [
   "whatsapp_prefill_default",
   "ga4_measurement_id",
   "meta_pixel_id",
+  "google_ads_id",
+  "tiktok_pixel_id",
   "office_address",
   "office_hours",
   "contact_email",

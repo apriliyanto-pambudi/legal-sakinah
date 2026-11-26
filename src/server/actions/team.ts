@@ -46,6 +46,7 @@ function parseExpertise(value: string | undefined): string[] {
 
 function revalidateTeam() {
   revalidateCmsTag(CACHE_TAGS.team);
+  revalidatePath("/");
   revalidatePath("/tim");
   revalidatePath("/admin/tim");
 }

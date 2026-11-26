@@ -9,6 +9,7 @@
  */
 
 import { sendGAEvent } from "@next/third-parties/google";
+import { trackLpAdsLead } from "./ads";
 import { GA4_CTA_EVENT, isGa4Enabled } from "./analytics";
 import { getSessionId, getStoredUtm } from "./utm";
 import type { CtaEventPayload } from "./validations/cta-event";
@@ -68,13 +69,17 @@ function sendToGa4(payload: CtaEventPayload): void {
 
 /**
  * Catat klik CTA ke database (sumber kebenaran dashboard) dan cermin ke GA4.
- * Keduanya berjalan paralel dan tidak menunda pembukaan WhatsApp.
+ * Di LP (lpSlug terisi): juga fire Lead ke Meta / Google Ads / TikTok.
+ * Semua fire-and-forget — tidak menunda pembukaan WhatsApp.
  */
 export function trackCtaClick(ctaLabel: string, lpSlug: string | null): void {
   try {
     const payload = buildCtaPayload(ctaLabel, lpSlug);
     sendToBackend(payload);
     sendToGa4(payload);
+    if (lpSlug) {
+      trackLpAdsLead();
+    }
   } catch {
     // Diabaikan dengan sengaja: konversi lebih penting daripada telemetri.
   }

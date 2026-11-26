@@ -8,6 +8,8 @@ const SETTING_KEYS = [
   "whatsapp_prefill_default",
   "ga4_measurement_id",
   "meta_pixel_id",
+  "google_ads_id",
+  "tiktok_pixel_id",
   "office_address",
   "office_hours",
   "contact_email",
@@ -26,6 +28,8 @@ export interface SiteSettingsMap {
   whatsapp_prefill_default: string;
   ga4_measurement_id: string;
   meta_pixel_id: string;
+  google_ads_id: string;
+  tiktok_pixel_id: string;
   office_address: string;
   office_hours: string;
   contact_email: string;
@@ -57,6 +61,8 @@ export async function getAllSettings(): Promise<SiteSettingsMap> {
     whatsapp_prefill_default: map["whatsapp_prefill_default"] ?? "",
     ga4_measurement_id: map["ga4_measurement_id"] ?? "",
     meta_pixel_id: map["meta_pixel_id"] ?? "",
+    google_ads_id: map["google_ads_id"] ?? "",
+    tiktok_pixel_id: map["tiktok_pixel_id"] ?? "",
     office_address: map["office_address"] ?? "",
     office_hours: map["office_hours"] ?? "",
     contact_email: map["contact_email"] ?? "",
